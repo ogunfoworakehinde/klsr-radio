@@ -1,5 +1,6 @@
 package com.klsr.radio.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -13,6 +14,7 @@ import com.klsr.radio.R
 import com.klsr.radio.RadioService
 import com.klsr.radio.adapters.HeroSliderAdapter
 import com.klsr.radio.databinding.FragmentHomeBinding
+import java.io.File
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
@@ -25,6 +27,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
+
+        // Show last crash if available
+        binding?.let { b ->
+            try {
+                val errorText = readLastCrash()
+                if (errorText.isNotBlank()) {
+                    b.tvCrashError.text = "Last crash:\n$errorText"
+                    b.tvCrashError.visibility = View.VISIBLE
+                }
+            } catch (_: Exception) {}
+        }
+
         binding?.let { b ->
             b.heroViewPager.adapter = HeroSliderAdapter(images)
             val dotsLayout: LinearLayout = b.dotsLayout
@@ -55,6 +69,22 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
             startAutoSlide()
         }
+    }
+
+    private fun readLastCrash(): String {
+        // Read from file first
+        try {
+            val file = File(requireContext().filesDir, "last_crash.txt")
+            if (file.exists()) {
+                return file.readText().take(2000) + "\n\n(End of crash log)"
+            }
+        } catch (_: Exception) {}
+        // Fallback to shared prefs
+        try {
+            val prefs = requireContext().getSharedPreferences("crash", Context.MODE_PRIVATE)
+            return prefs.getString("last_error", "") ?: ""
+        } catch (_: Exception) {}
+        return ""
     }
 
     private fun startAutoSlide() {
