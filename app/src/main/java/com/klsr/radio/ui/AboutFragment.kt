@@ -8,12 +8,20 @@ import com.klsr.radio.databinding.FragmentAboutBinding
 
 class AboutFragment : Fragment(R.layout.fragment_about) {
     private var _binding: FragmentAboutBinding? = null
+    private val binding get() = _binding!!
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
             _binding = FragmentAboutBinding.bind(view)
-        } catch (e: Exception) { e.printStackTrace() }
+            binding.imageTeam1.setImageResource(R.drawable.team1)
+            binding.imageTeam2.setImageResource(R.drawable.manager)
+            binding.imageTeam3.setImageResource(R.drawable.voice)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

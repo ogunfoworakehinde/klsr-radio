@@ -1,33 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:background="?attr/colorPrimary">
-    <LinearLayout android:orientation="vertical" android:padding="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <TextView android:text="Support Our Mission" android:textColor="@android:color/white" android:textSize="24sp" android:textStyle="bold" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorPrimary">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Support Our Mission"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
         <!-- Zenith -->
-        <LinearLayout android:orientation="horizontal" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/zenith_bank_logo" />
-            <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:paddingStart="12dp">
-                <TextView android:text="Zenith Bank (NGN)" android:textColor="@android:color/white" android:textStyle="bold" />
-                <TextView android:text="1229216755" android:textColor="#B3FFFFFF" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/zenithLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="#555555" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:paddingStart="12dp">
+                <TextView
+                    android:text="Zenith Bank (NGN)"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+                <TextView
+                    android:text="1229216755"
+                    android:textColor="#B3FFFFFF" />
             </LinearLayout>
-            <Button android:id="@+id/copyZenithBtn" android:text="Copy" />
+            <Button
+                android:id="@+id/copyZenithBtn"
+                android:text="Copy" />
         </LinearLayout>
+
         <!-- GTBank NGN -->
-        <LinearLayout android:orientation="horizontal" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/gtbank_logo" />
-            <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:paddingStart="12dp">
-                <TextView android:text="GTBank (NGN)" android:textColor="@android:color/white" android:textStyle="bold" />
-                <TextView android:text="0892125365" android:textColor="#B3FFFFFF" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/gtbankNgnLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="#555555" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:paddingStart="12dp">
+                <TextView
+                    android:text="GTBank (NGN)"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+                <TextView
+                    android:text="0892125365"
+                    android:textColor="#B3FFFFFF" />
             </LinearLayout>
-            <Button android:id="@+id/copyGtbankNgnBtn" android:text="Copy" />
+            <Button
+                android:id="@+id/copyGtbankNgnBtn"
+                android:text="Copy" />
         </LinearLayout>
+
         <!-- GTBank USD -->
-        <LinearLayout android:orientation="horizontal" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-            <ImageView android:layout_width="60dp" android:layout_height="60dp" android:src="@drawable/gtbank_logo" />
-            <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:paddingStart="12dp">
-                <TextView android:text="GTBank (USD)" android:textColor="@android:color/white" android:textStyle="bold" />
-                <TextView android:text="0892172060" android:textColor="#B3FFFFFF" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/gtbankUsdLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="#555555" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:paddingStart="12dp">
+                <TextView
+                    android:text="GTBank (USD)"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+                <TextView
+                    android:text="0892172060"
+                    android:textColor="#B3FFFFFF" />
             </LinearLayout>
-            <Button android:id="@+id/copyGtbankUsdBtn" android:text="Copy" />
+            <Button
+                android:id="@+id/copyGtbankUsdBtn"
+                android:text="Copy" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

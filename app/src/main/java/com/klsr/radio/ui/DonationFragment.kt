@@ -18,6 +18,9 @@ class DonationFragment : Fragment(R.layout.fragment_donation) {
         super.onViewCreated(view, savedInstanceState)
         try {
             _binding = FragmentDonationBinding.bind(view)
+            binding.zenithLogo.setImageResource(R.drawable.zenith_bank_logo)
+            binding.gtbankNgnLogo.setImageResource(R.drawable.gtbank_logo)
+            binding.gtbankUsdLogo.setImageResource(R.drawable.gtbank_logo)
             binding.copyZenithBtn.setOnClickListener { copy("1229216755") }
             binding.copyGtbankNgnBtn.setOnClickListener { copy("0892125365") }
             binding.copyGtbankUsdBtn.setOnClickListener { copy("0892172060") }
