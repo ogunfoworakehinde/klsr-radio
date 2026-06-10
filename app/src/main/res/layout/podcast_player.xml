@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/player_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:background="#1a235c"
+    android:orientation="vertical"
     android:padding="16dp"
     android:visibility="gone">
 
@@ -11,7 +12,6 @@
         android:id="@+id/currentPodcastTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Now Playing"
         android:textColor="@android:color/white"
         android:textStyle="bold" />
 
@@ -19,28 +19,27 @@
         android:id="@+id/currentPodcastInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
         android:textColor="#B3FFFFFF" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <Button
+        <ImageButton
             android:id="@+id/btnPodcastPlayPause"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_play_arrow"
             android:background="@drawable/circle_red_bg"
+            android:src="@drawable/ic_play_arrow"
             android:tint="@android:color/white" />
 
         <SeekBar
             android:id="@+id/podcastSeekBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="8dp" />
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1" />
     </LinearLayout>
 </LinearLayout>

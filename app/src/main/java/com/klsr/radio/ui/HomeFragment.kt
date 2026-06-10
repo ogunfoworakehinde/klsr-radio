@@ -18,10 +18,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -33,12 +30,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         )
         binding.heroViewPager.adapter = HeroSliderAdapter(images)
 
-        // Dots indicator
+        // Dots
         val dotsLayout: LinearLayout = binding.dotsLayout
         dotsLayout.removeAllViews()
         for (i in images.indices) {
             val dot = ImageView(requireContext()).apply {
-                setImageResource(R.drawable.dot_inactive)
+                setImageResource(if (i == 0) R.drawable.dot_active else R.drawable.dot_inactive)
                 layoutParams = LinearLayout.LayoutParams(24, 24).apply { marginEnd = 8 }
             }
             dotsLayout.addView(dot)
@@ -55,7 +52,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding.btnListenLive.setOnClickListener {
             val intent = Intent(requireContext(), RadioService::class.java).apply {
-                action = RadioService.ACTION_PLAY_PAUSE // toggle play
+                action = RadioService.ACTION_PLAY_PAUSE
             }
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 requireContext().startForegroundService(intent)

@@ -40,8 +40,6 @@ class RadioService : Service() {
         player.setMediaItem(MediaItem.fromUri(STATIONS[currentStationIndex].url))
         player.prepare()
         player.playWhenReady = true
-
-        // Build media session without a custom callback – all control is via PendingIntents
         mediaSession = MediaSession.Builder(this, player).build()
     }
 
@@ -102,7 +100,7 @@ class RadioService : Service() {
             )
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.drawable.logo)
             .setContentTitle(station.name)
             .setContentText(station.description)
             .setContentIntent(openIntent)
