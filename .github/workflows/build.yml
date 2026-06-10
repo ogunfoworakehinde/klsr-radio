@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest      # 2-core, 7 GB RAM – enough after memory tweak
     steps:
       - uses: actions/checkout@v4
 
@@ -20,7 +20,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          # This will add 'gradle' to the PATH and cache dependencies
           gradle-version: '8.4'
 
       - name: Build debug APK
