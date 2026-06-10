@@ -6,10 +6,15 @@ import androidx.appcompat.app.AppCompatDelegate
 class RadioApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
-        val isDark = prefs.getBoolean("dark_mode", false)
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        )
+        try {
+            val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+            val isDark = prefs.getBoolean("dark_mode", false)
+            AppCompatDelegate.setDefaultNightMode(
+                if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            )
+        } catch (e: Exception) {
+            // If anything goes wrong, stay with light theme
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
     }
 }

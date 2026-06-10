@@ -6,11 +6,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation.fragment.NavHostFragment
@@ -43,21 +42,33 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         binding.bottomNav.setupWithNavController(navController)
 
-        // MediaController to observe playback
-        val sessionToken = SessionToken(this, ComponentName(this, RadioService::class.java))
-        val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
-        controllerFuture.addListener({
-            mediaController = controllerFuture.get()
-            mediaController?.let { mc ->
-                mc.addListener(PlayerListener())
-                updatePlayerBar(mc)
-            }
-        }, MoreExecutors.directExecutor())
+        // MediaController – wrap in try/catch so it never crashes the app
+        try {
+            val sessionToken = SessionToken(this, ComponentName(this, RadioService::class.java))
+            val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+            controllerFuture.addListener({
+                try {
+                    mediaController = controllerFuture.get()
+                    mediaController?.let { mc ->
+                        mc.addListener(PlayerListener())
+                        updatePlayerBar(mc)
+                    }
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Failed to get MediaController", e)
+                }
+            }, MoreExecutors.directExecutor())
+        } catch (e: Exception) {
+            Log.e("MainActivity", "MediaController setup failed", e)
+        }
 
         // Player bar buttons
         binding.playerBar.btnPlayPause.setOnClickListener {
             mediaController?.let { mc ->
-                if (mc.isPlaying) mc.pause() else mc.play()
+                try {
+                    if (mc.isPlaying) mc.pause() else mc.play()
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Play/pause failed", e)
+                }
             }
         }
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
@@ -78,10 +89,14 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, RadioService::class.java).apply {
             putExtra(RadioService.EXTRA_STATION_INDEX, newIndex)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to start service", e)
         }
     }
 
@@ -93,11 +108,11 @@ class MainActivity : AppCompatActivity() {
         binding.playerBar.btnPlayPause.setImageResource(icon)
     }
 
-    inner class PlayerListener : Player.Listener {
+    inner class PlayerListener : androidx.media3.common.Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             updatePlayerBar(mediaController)
         }
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+        override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
             val index = RadioService.STATIONS.indexOfFirst { it.url == mediaItem?.localConfiguration?.uri.toString() }
             if (index != -1) appState.currentStation = index
             updatePlayerBar(mediaController)
