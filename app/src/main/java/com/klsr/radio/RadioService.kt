@@ -8,10 +8,8 @@ import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaStyleNotificationHelper
@@ -43,19 +41,8 @@ class RadioService : Service() {
         player.prepare()
         player.playWhenReady = true
 
-        mediaSession = MediaSession.Builder(this, player)
-            .setCallback(object : MediaSession.Callback {
-                override fun onPlayRequest() {
-                    player.play()
-                }
-                override fun onPauseRequest() {
-                    player.pause()
-                }
-                override fun onStopRequest() {
-                    stopSelf()
-                }
-            })
-            .build()
+        // Build media session without a custom callback – all control is via PendingIntents
+        mediaSession = MediaSession.Builder(this, player).build()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
