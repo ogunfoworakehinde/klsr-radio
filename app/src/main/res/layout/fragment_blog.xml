@@ -1,5 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="?attr/colorPrimary">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorPrimary">
     <EditText android:id="@+id/searchEditText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="8dp" android:hint="Search articles..." android:inputType="text" android:background="@android:drawable/edit_text" />
     <androidx.recyclerview.widget.RecyclerView android:id="@+id/blogRecyclerView" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
     <include android:id="@+id/paginationControls" layout="@layout/pagination_controls" />

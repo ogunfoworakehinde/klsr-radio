@@ -1,29 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?attr/colorPrimary">
-
-    <!-- Podcast Hero -->
-    <ImageView
-        android:id="@+id/podcastHeroImage"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/hepp" />
-
-    <!-- Player control (hidden until episode selected) -->
-    <include
-        android:id="@+id/playerLayout"
-        layout="@layout/podcast_player" />
-
-    <!-- Episode list -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/podcastRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="8dp" />
+    <ImageView android:id="@+id/podcastHeroImage" android:layout_width="match_parent" android:layout_height="200dp" android:scaleType="centerCrop" android:background="#333" />
+    <include android:id="@+id/playerLayout" layout="@layout/podcast_player" />
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/podcastRecyclerView" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:padding="8dp" />
 </LinearLayout>

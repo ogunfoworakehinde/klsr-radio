@@ -13,6 +13,7 @@ import com.klsr.radio.R
 import com.klsr.radio.RadioService
 import com.klsr.radio.adapters.HeroSliderAdapter
 import com.klsr.radio.databinding.FragmentHomeBinding
+import com.klsr.radio.utils.SafeImageHelper
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
@@ -31,7 +32,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             dotsLayout.removeAllViews()
             for (i in images.indices) {
                 val dot = ImageView(requireContext()).apply {
-                    setImageResource(if (i == 0) R.drawable.dot_active else R.drawable.dot_inactive)
+                    SafeImageHelper.load(context, this, if (i == 0) R.drawable.dot_active else R.drawable.dot_inactive)
                     layoutParams = LinearLayout.LayoutParams(24, 24).apply { marginEnd = 8 }
                 }
                 dotsLayout.addView(dot)
@@ -40,18 +41,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 override fun onPageSelected(position: Int) {
                     currentSlide = position
                     for (i in 0 until dotsLayout.childCount) {
-                        (dotsLayout.getChildAt(i) as ImageView).setImageResource(
-                            if (i == position) R.drawable.dot_active else R.drawable.dot_inactive
-                        )
+                        val child = dotsLayout.getChildAt(i) as? ImageView ?: continue
+                        SafeImageHelper.load(context, child, if (i == position) R.drawable.dot_active else R.drawable.dot_inactive)
                     }
                     startAutoSlide()
                 }
             })
             b.btnListenLive.setOnClickListener {
-                val i = Intent(requireContext(), RadioService::class.java).apply { putExtra(RadioService.EXTRA_STATION_INDEX, 0) }
+                val intent = Intent(requireContext(), RadioService::class.java).apply { putExtra(RadioService.EXTRA_STATION_INDEX, 0) }
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                    requireContext().startForegroundService(i)
-                else requireContext().startService(i)
+                    requireContext().startForegroundService(intent)
+                else requireContext().startService(intent)
             }
             startAutoSlide()
         }

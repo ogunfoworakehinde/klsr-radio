@@ -11,6 +11,7 @@ import com.klsr.radio.R
 import com.klsr.radio.adapters.PodcastAdapter
 import com.klsr.radio.data.PodcastEpisode
 import com.klsr.radio.databinding.FragmentPodcastBinding
+import com.klsr.radio.utils.SafeImageHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,7 +27,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPodcastBinding.bind(view)
         binding?.let { b ->
-            b.podcastHeroImage.setImageResource(R.drawable.hepp)
+            SafeImageHelper.load(context, b.podcastHeroImage, R.drawable.hepp)
             b.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             loadPodcasts()
             b.playerLayout.btnPodcastPlayPause.setOnClickListener {
@@ -39,10 +40,9 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     }
 
     private fun updatePlayPauseIcon() {
-        binding?.let {
-            val icon = if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
-            it.playerLayout.btnPodcastPlayPause.setImageResource(icon)
-        }
+        binding?.playerLayout?.btnPodcastPlayPause?.setImageResource(
+            if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
+        )
     }
 
     private fun loadPodcasts() {
@@ -84,6 +84,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                         it.playerLayout.root.visibility = View.VISIBLE
                     }
                 }
+                setOnErrorListener { _, _, _ -> false }
             } catch (e: Exception) {
                 Toast.makeText(context, "Unable to play", Toast.LENGTH_SHORT).show()
             }

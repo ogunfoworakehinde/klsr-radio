@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.klsr.radio.R
 import com.klsr.radio.databinding.FragmentDonationBinding
+import com.klsr.radio.utils.SafeImageHelper
 
 class DonationFragment : Fragment(R.layout.fragment_donation) {
     private var _binding: FragmentDonationBinding? = null
@@ -18,9 +19,9 @@ class DonationFragment : Fragment(R.layout.fragment_donation) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDonationBinding.bind(view)
         binding?.let { b ->
-            b.zenithLogo.setImageResource(R.drawable.zenith_bank_logo)
-            b.gtbankNgnLogo.setImageResource(R.drawable.gtbank_logo)
-            b.gtbankUsdLogo.setImageResource(R.drawable.gtbank_logo)
+            SafeImageHelper.load(context, b.zenithLogo, R.drawable.zenith_bank_logo)
+            SafeImageHelper.load(context, b.gtbankNgnLogo, R.drawable.gtbank_logo)
+            SafeImageHelper.load(context, b.gtbankUsdLogo, R.drawable.gtbank_logo)
             b.copyZenithBtn.setOnClickListener { copy("1229216755") }
             b.copyGtbankNgnBtn.setOnClickListener { copy("0892125365") }
             b.copyGtbankUsdBtn.setOnClickListener { copy("0892172060") }
