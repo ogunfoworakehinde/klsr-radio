@@ -8,8 +8,10 @@ import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaStyleNotificationHelper
@@ -40,8 +42,19 @@ class RadioService : Service() {
         player.setMediaItem(MediaItem.fromUri(STATIONS[currentStationIndex].url))
         player.prepare()
         player.playWhenReady = true
+
         mediaSession = MediaSession.Builder(this, player)
-            .setCallback(MediaSessionCallback())
+            .setCallback(object : MediaSession.Callback {
+                override fun onPlayRequest() {
+                    player.play()
+                }
+                override fun onPauseRequest() {
+                    player.pause()
+                }
+                override fun onStopRequest() {
+                    stopSelf()
+                }
+            })
             .build()
     }
 
@@ -114,11 +127,5 @@ class RadioService : Service() {
             )
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
-    }
-
-    inner class MediaSessionCallback : MediaSession.Callback {
-        override fun onPlay() { player.play() }
-        override fun onPause() { player.pause() }
-        override fun onStop() { stopSelf() }
     }
 }
