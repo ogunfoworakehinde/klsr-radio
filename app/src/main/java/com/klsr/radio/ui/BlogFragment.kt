@@ -3,6 +3,7 @@ package com.klsr.radio.ui
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -25,25 +26,31 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
     private var allPosts = emptyList<BlogPost>()
     private var currentPage = 1
     private var totalPages = 1
-    private var totalPosts = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentBlogBinding.bind(view)
+        try {
+            _binding = FragmentBlogBinding.bind(view)
+            binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            loadPosts(1)
 
-        binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        loadPosts(1)
+            binding.searchEditText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    filterPosts(s?.toString() ?: "")
+                }
+                override fun afterTextChanged(s: Editable?) {}
+            })
 
-        binding.searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                filterPosts(s?.toString() ?: "")
+            binding.paginationControls.prevPageBtn.setOnClickListener {
+                if (currentPage > 1) loadPosts(currentPage - 1)
             }
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        binding.paginationControls.prevPageBtn.setOnClickListener { if (currentPage > 1) loadPosts(currentPage - 1) }
-        binding.paginationControls.nextPageBtn.setOnClickListener { if (currentPage < totalPages) loadPosts(currentPage + 1) }
+            binding.paginationControls.nextPageBtn.setOnClickListener {
+                if (currentPage < totalPages) loadPosts(currentPage + 1)
+            }
+        } catch (e: Exception) {
+            Log.e("BlogFragment", "onViewCreated failed", e)
+        }
     }
 
     private fun loadPosts(page: Int) {
@@ -68,11 +75,10 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
                         posts.add(BlogPost(id, title, excerpt, date, imageUrl, author))
                     }
                     totalPages = conn.getHeaderField("X-WP-TotalPages")?.toIntOrNull() ?: 1
-                    totalPosts = conn.getHeaderField("X-WP-Total")?.toIntOrNull() ?: 0
                     currentPage = page
                     Pair(posts, totalPages)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.e("BlogFragment", "API load failed", e)
                     Pair(emptyList<BlogPost>(), 1)
                 }
             }

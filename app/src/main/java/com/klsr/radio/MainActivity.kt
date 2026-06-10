@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Notification permission (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -36,41 +35,41 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Navigation
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-        binding.bottomNav.setupWithNavController(navController)
+        binding.bottomNav.setupWithNavController(navHostFragment.navController)
 
-        // MediaController – wrap in try/catch so it never crashes the app
+        // Try to connect to MediaController
         try {
             val sessionToken = SessionToken(this, ComponentName(this, RadioService::class.java))
             val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
             controllerFuture.addListener({
                 try {
                     mediaController = controllerFuture.get()
-                    mediaController?.let { mc ->
-                        mc.addListener(PlayerListener())
-                        updatePlayerBar(mc)
-                    }
+                    mediaController?.addListener(PlayerListener())
+                    updatePlayerBar()
                 } catch (e: Exception) {
-                    Log.e("MainActivity", "Failed to get MediaController", e)
+                    Log.e("MainActivity", "MediaController failed", e)
                 }
             }, MoreExecutors.directExecutor())
         } catch (e: Exception) {
-            Log.e("MainActivity", "MediaController setup failed", e)
+            Log.e("MainActivity", "SessionToken failed", e)
         }
 
         // Player bar buttons
         binding.playerBar.btnPlayPause.setOnClickListener {
             mediaController?.let { mc ->
                 try {
-                    if (mc.isPlaying) mc.pause() else mc.play()
+                    if (mc.isPlaying) mc.pause() else {
+                        ensureServiceStarted()
+                        mc.play()
+                    }
                 } catch (e: Exception) {
-                    Log.e("MainActivity", "Play/pause failed", e)
+                    Log.e("MainActivity", "Play/pause error", e)
                 }
-            }
+            } ?: ensureServiceStarted()
         }
+
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
         binding.playerBar.btnChannelSwitcher.setOnClickListener {
@@ -83,24 +82,30 @@ class MainActivity : AppCompatActivity() {
 
     private var appState = object { var currentStation = 0 }
 
-    private fun switchStation(delta: Int) {
-        val newIndex = (appState.currentStation + delta + RadioService.STATIONS.size) % RadioService.STATIONS.size
-        appState.currentStation = newIndex
+    private fun ensureServiceStarted() {
         val intent = Intent(this, RadioService::class.java).apply {
-            putExtra(RadioService.EXTRA_STATION_INDEX, newIndex)
+            putExtra(RadioService.EXTRA_STATION_INDEX, appState.currentStation)
         }
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent)
-            } else {
-                startService(intent)
-            }
-        } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to start service", e)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
         }
     }
 
-    private fun updatePlayerBar(mc: MediaController?) {
+    private fun switchStation(delta: Int) {
+        appState.currentStation = (appState.currentStation + delta + RadioService.STATIONS.size) % RadioService.STATIONS.size
+        val intent = Intent(this, RadioService::class.java).apply {
+            putExtra(RadioService.EXTRA_STATION_INDEX, appState.currentStation)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+    }
+
+    private fun updatePlayerBar(mc: MediaController? = mediaController) {
         val station = RadioService.STATIONS[appState.currentStation]
         binding.playerBar.stationName.text = station.name
         binding.playerBar.stationDesc.text = station.description
@@ -110,12 +115,12 @@ class MainActivity : AppCompatActivity() {
 
     inner class PlayerListener : androidx.media3.common.Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
-            updatePlayerBar(mediaController)
+            updatePlayerBar()
         }
         override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
             val index = RadioService.STATIONS.indexOfFirst { it.url == mediaItem?.localConfiguration?.uri.toString() }
             if (index != -1) appState.currentStation = index
-            updatePlayerBar(mediaController)
+            updatePlayerBar()
         }
     }
 }

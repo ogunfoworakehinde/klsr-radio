@@ -2,6 +2,7 @@ package com.klsr.radio.ui
 
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +14,6 @@ import com.klsr.radio.databinding.FragmentPodcastBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.net.URL
 
@@ -21,21 +21,21 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     private var _binding: FragmentPodcastBinding? = null
     private val binding get() = _binding!!
     private var mediaPlayer: MediaPlayer? = null
-    private var episodes = emptyList<PodcastEpisode>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentPodcastBinding.bind(view)
-
-        binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        loadPodcasts()
-
-        // The player layout is included with id 'playerLayout' (generated binding is playerLayout)
-        binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
-            mediaPlayer?.let {
-                if (it.isPlaying) it.pause() else it.start()
-                updatePlayPauseButton()
+        try {
+            _binding = FragmentPodcastBinding.bind(view)
+            binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            loadPodcasts()
+            binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
+                mediaPlayer?.let {
+                    if (it.isPlaying) it.pause() else it.start()
+                    updatePlayPauseButton()
+                }
             }
+        } catch (e: Exception) {
+            Log.e("PodcastFragment", "onViewCreated failed", e)
         }
     }
 
@@ -55,13 +55,13 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     val episodes = mutableListOf<PodcastEpisode>()
                     var currentEpisode: PodcastEpisode? = null
                     var currentTag = ""
-                    while (eventType != XmlPullParser.END_DOCUMENT) {
+                    while (eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
                         when (eventType) {
-                            XmlPullParser.START_TAG -> {
+                            org.xmlpull.v1.XmlPullParser.START_TAG -> {
                                 currentTag = parser.name
                                 if (currentTag == "item") currentEpisode = PodcastEpisode()
                             }
-                            XmlPullParser.TEXT -> {
+                            org.xmlpull.v1.XmlPullParser.TEXT -> {
                                 when (currentTag) {
                                     "title" -> currentEpisode?.title = parser.text
                                     "description" -> currentEpisode?.description = parser.text
@@ -71,7 +71,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                                     "itunes:duration" -> currentEpisode?.duration = parser.text
                                 }
                             }
-                            XmlPullParser.END_TAG -> {
+                            org.xmlpull.v1.XmlPullParser.END_TAG -> {
                                 if (parser.name == "item") {
                                     currentEpisode?.let { episodes.add(it) }
                                     currentEpisode = null
@@ -83,13 +83,11 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     }
                     episodes
                 } catch (e: Exception) {
+                    Log.e("PodcastFragment", "RSS load failed", e)
                     emptyList()
                 }
             }
-            episodes = list
-            binding.podcastRecyclerView.adapter = PodcastAdapter(list) { episode ->
-                playEpisode(episode)
-            }
+            binding.podcastRecyclerView.adapter = PodcastAdapter(list) { episode -> playEpisode(episode) }
             binding.paginationControls.root.visibility = View.GONE
         }
     }
@@ -108,14 +106,14 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     binding.playerLayout.root.visibility = View.VISIBLE
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("PodcastFragment", "Play failed", e)
             }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mediaPlayer?.release()
+        try { mediaPlayer?.release() } catch (_: Exception) {}
         mediaPlayer = null
         _binding = null
     }
