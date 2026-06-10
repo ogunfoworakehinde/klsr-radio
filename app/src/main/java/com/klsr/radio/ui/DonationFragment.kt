@@ -12,19 +12,19 @@ import com.klsr.radio.databinding.FragmentDonationBinding
 
 class DonationFragment : Fragment(R.layout.fragment_donation) {
     private var _binding: FragmentDonationBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentDonationBinding.bind(view)
-            binding.zenithLogo.setImageResource(R.drawable.zenith_bank_logo)
-            binding.gtbankNgnLogo.setImageResource(R.drawable.gtbank_logo)
-            binding.gtbankUsdLogo.setImageResource(R.drawable.gtbank_logo)
-            binding.copyZenithBtn.setOnClickListener { copy("1229216755") }
-            binding.copyGtbankNgnBtn.setOnClickListener { copy("0892125365") }
-            binding.copyGtbankUsdBtn.setOnClickListener { copy("0892172060") }
-        } catch (e: Exception) { e.printStackTrace() }
+        _binding = FragmentDonationBinding.bind(view)
+        binding?.let { b ->
+            b.zenithLogo.setImageResource(R.drawable.zenith_bank_logo)
+            b.gtbankNgnLogo.setImageResource(R.drawable.gtbank_logo)
+            b.gtbankUsdLogo.setImageResource(R.drawable.gtbank_logo)
+            b.copyZenithBtn.setOnClickListener { copy("1229216755") }
+            b.copyGtbankNgnBtn.setOnClickListener { copy("0892125365") }
+            b.copyGtbankUsdBtn.setOnClickListener { copy("0892172060") }
+        }
     }
 
     private fun copy(text: String) {

@@ -17,18 +17,14 @@ import java.net.URL
 
 class SinglePostFragment : Fragment(R.layout.fragment_single_post) {
     private var _binding: FragmentSinglePostBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
     private val postId: Int by lazy { arguments?.getInt("postId", 0) ?: 0 }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentSinglePostBinding.bind(view)
-            binding.backBtn.setOnClickListener { parentFragmentManager.popBackStack() }
-            loadPost()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        _binding = FragmentSinglePostBinding.bind(view)
+        binding?.backBtn?.setOnClickListener { parentFragmentManager.popBackStack() }
+        loadPost()
     }
 
     private fun loadPost() {
@@ -41,9 +37,8 @@ class SinglePostFragment : Fragment(R.layout.fragment_single_post) {
                     Gson().fromJson(json, BlogPostResponse::class.java)
                 } catch (e: Exception) { null }
             }
-            if (!isAdded) return@launch
             post?.let {
-                _binding?.let { b ->
+                binding?.let { b ->
                     b.postTitle.text = it.title.rendered
                     b.postDate.text = it.date.take(10)
                     b.postContent.text = Html.fromHtml(it.content.rendered, Html.FROM_HTML_MODE_COMPACT)

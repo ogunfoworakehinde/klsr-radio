@@ -11,27 +11,27 @@ import com.klsr.radio.databinding.FragmentSettingsBinding
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private var _binding: FragmentSettingsBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
     private lateinit var prefs: SharedPreferences
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentSettingsBinding.bind(view)
+        _binding = FragmentSettingsBinding.bind(view)
+        binding?.let { b ->
             prefs = requireContext().getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
-            binding.darkModeSwitch.isChecked = prefs.getBoolean("dark_mode", false)
-            binding.volumeSeekBar.progress = prefs.getInt("volume", 100)
-            binding.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            b.darkModeSwitch.isChecked = prefs.getBoolean("dark_mode", false)
+            b.volumeSeekBar.progress = prefs.getInt("volume", 100)
+            b.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
                 prefs.edit().putBoolean("dark_mode", isChecked).apply()
                 AppCompatDelegate.setDefaultNightMode(
                     if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
                 )
             }
-            binding.saveSettingsBtn.setOnClickListener {
-                prefs.edit().putInt("volume", binding.volumeSeekBar.progress).apply()
+            b.saveSettingsBtn.setOnClickListener {
+                prefs.edit().putInt("volume", b.volumeSeekBar.progress).apply()
                 Toast.makeText(requireContext(), "Settings saved", Toast.LENGTH_SHORT).show()
             }
-        } catch (e: Exception) { e.printStackTrace() }
+        }
     }
 
     override fun onDestroyView() {

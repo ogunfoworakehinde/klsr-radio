@@ -9,17 +9,17 @@ import com.klsr.radio.databinding.FragmentMoreBinding
 
 class MoreFragment : Fragment(R.layout.fragment_more) {
     private var _binding: FragmentMoreBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentMoreBinding.bind(view)
-            binding.aboutBtn.setOnClickListener { findNavController().navigate(R.id.aboutFragment) }
-            binding.donateBtn.setOnClickListener { findNavController().navigate(R.id.donationFragment) }
-            binding.contactBtn.setOnClickListener { findNavController().navigate(R.id.contactFragment) }
-            binding.settingsBtn.setOnClickListener { findNavController().navigate(R.id.settingsFragment) }
-        } catch (e: Exception) { e.printStackTrace() }
+        _binding = FragmentMoreBinding.bind(view)
+        binding?.let {
+            it.aboutBtn.setOnClickListener { findNavController().navigate(R.id.aboutFragment) }
+            it.donateBtn.setOnClickListener { findNavController().navigate(R.id.donationFragment) }
+            it.contactBtn.setOnClickListener { findNavController().navigate(R.id.contactFragment) }
+            it.settingsBtn.setOnClickListener { findNavController().navigate(R.id.settingsFragment) }
+        }
     }
 
     override fun onDestroyView() {

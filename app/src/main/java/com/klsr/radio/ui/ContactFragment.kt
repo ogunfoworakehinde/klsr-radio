@@ -18,31 +18,31 @@ import java.net.URL
 
 class ContactFragment : Fragment(R.layout.fragment_contact) {
     private var _binding: FragmentContactBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentContactBinding.bind(view)
-            binding.sendContactBtn.setOnClickListener {
-                val name = binding.contactNameEditText.text.toString().trim()
-                val email = binding.contactEmailEditText.text.toString().trim()
-                val subject = binding.contactSubjectEditText.text.toString().trim()
-                val msg = binding.contactMessageEditText.text.toString().trim()
+        _binding = FragmentContactBinding.bind(view)
+        binding?.let { b ->
+            b.sendContactBtn.setOnClickListener {
+                val name = b.contactNameEditText.text.toString().trim()
+                val email = b.contactEmailEditText.text.toString().trim()
+                val subject = b.contactSubjectEditText.text.toString().trim()
+                val msg = b.contactMessageEditText.text.toString().trim()
                 if (name.isEmpty() || email.isEmpty() || msg.isEmpty()) {
                     Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
                 sendEmailJS(name, email, subject, msg)
             }
-            binding.btnWhatsapp.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/2349160006614"))) }
-            binding.btnFacebook.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/kingdomLifestyleradio/"))) }
-            binding.btnTwitter.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/kingdomlifestr"))) }
-            binding.btnInstagram.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/kingdom.lifestyleradio"))) }
-            binding.btnYoutube.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://m.youtube.com/channel/UC64-kfcZkFuIi83pPqFpECQ"))) }
-            binding.btnTelegram.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/kingdomlifestyleradio"))) }
-            binding.btnWebsite.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://kingdomlifestyleradio.com"))) }
-        } catch (e: Exception) { e.printStackTrace() }
+            b.btnWhatsapp.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/2349160006614"))) }
+            b.btnFacebook.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/kingdomLifestyleradio/"))) }
+            b.btnTwitter.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/kingdomlifestr"))) }
+            b.btnInstagram.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/kingdom.lifestyleradio"))) }
+            b.btnYoutube.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://m.youtube.com/channel/UC64-kfcZkFuIi83pPqFpECQ"))) }
+            b.btnTelegram.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/kingdomlifestyleradio"))) }
+            b.btnWebsite.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://kingdomlifestyleradio.com"))) }
+        }
     }
 
     private fun sendEmailJS(name: String, email: String, subject: String, message: String) {
@@ -72,10 +72,12 @@ class ContactFragment : Fragment(R.layout.fragment_contact) {
             if (!isAdded) return@launch
             Toast.makeText(requireContext(), if (ok) "Message sent!" else "We'll get back to you.", Toast.LENGTH_SHORT).show()
             if (ok) {
-                binding.contactNameEditText.text?.clear()
-                binding.contactEmailEditText.text?.clear()
-                binding.contactSubjectEditText.text?.clear()
-                binding.contactMessageEditText.text?.clear()
+                binding?.let {
+                    it.contactNameEditText.text?.clear()
+                    it.contactEmailEditText.text?.clear()
+                    it.contactSubjectEditText.text?.clear()
+                    it.contactMessageEditText.text?.clear()
+                }
             }
         }
     }

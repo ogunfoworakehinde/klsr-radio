@@ -23,26 +23,24 @@ import java.net.URL
 
 class BlogFragment : Fragment(R.layout.fragment_blog) {
     private var _binding: FragmentBlogBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
     private var allPosts = emptyList<BlogPost>()
     private var currentPage = 1
     private var totalPages = 1
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentBlogBinding.bind(view)
-            binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        _binding = FragmentBlogBinding.bind(view)
+        binding?.let { b ->
+            b.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             loadPosts(1)
-            binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            b.searchEditText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) { filter(s?.toString() ?: "") }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             })
-            binding.paginationControls.prevPageBtn.setOnClickListener { if (currentPage > 1) loadPosts(currentPage - 1) }
-            binding.paginationControls.nextPageBtn.setOnClickListener { if (currentPage < totalPages) loadPosts(currentPage + 1) }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            b.paginationControls.prevPageBtn.setOnClickListener { if (currentPage > 1) loadPosts(currentPage - 1) }
+            b.paginationControls.nextPageBtn.setOnClickListener { if (currentPage < totalPages) loadPosts(currentPage + 1) }
         }
     }
 
@@ -64,11 +62,10 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
                     Pair(items, total)
                 } catch (e: Exception) { Pair(emptyList<BlogPost>(), 1) }
             }
-            if (!isAdded) return@launch
             allPosts = result.first
             totalPages = result.second
             currentPage = page
-            _binding?.let {
+            binding?.let {
                 it.blogRecyclerView.adapter = BlogPostAdapter(allPosts) { postId ->
                     findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
                 }
@@ -80,7 +77,7 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
 
     private fun filter(query: String) {
         val filtered = if (query.isBlank()) allPosts else allPosts.filter { it.title.contains(query, ignoreCase = true) || it.excerpt.contains(query, ignoreCase = true) }
-        _binding?.blogRecyclerView?.adapter = BlogPostAdapter(filtered) { postId ->
+        binding?.blogRecyclerView?.adapter = BlogPostAdapter(filtered) { postId ->
             findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
         }
     }

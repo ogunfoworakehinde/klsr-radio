@@ -19,30 +19,27 @@ import java.net.URL
 
 class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     private var _binding: FragmentPodcastBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentPodcastBinding.bind(view)
-            binding.podcastHeroImage.setImageResource(R.drawable.hepp)
-            binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        _binding = FragmentPodcastBinding.bind(view)
+        binding?.let { b ->
+            b.podcastHeroImage.setImageResource(R.drawable.hepp)
+            b.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             loadPodcasts()
-
-            binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
+            b.playerLayout.btnPodcastPlayPause.setOnClickListener {
                 mediaPlayer?.let { mp ->
                     if (mp.isPlaying) mp.pause() else mp.start()
                     updatePlayPauseIcon()
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 
     private fun updatePlayPauseIcon() {
-        _binding?.let {
+        binding?.let {
             val icon = if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
             it.playerLayout.btnPodcastPlayPause.setImageResource(icon)
         }
@@ -68,36 +65,27 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     }
                 } catch (e: Exception) { emptyList() }
             }
-            if (!isAdded) return@launch
-            _binding?.let {
-                it.podcastRecyclerView.adapter = PodcastAdapter(episodes) { episode -> playEpisode(episode) }
-            }
+            binding?.podcastRecyclerView?.adapter = PodcastAdapter(episodes) { episode -> playEpisode(episode) }
         }
     }
 
     private fun playEpisode(episode: PodcastEpisode) {
-        if (!isAdded) return
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer().apply {
             try {
                 setDataSource(episode.audioUrl)
                 prepareAsync()
                 setOnPreparedListener {
-                    if (!isAdded) return@setOnPreparedListener
                     start()
                     updatePlayPauseIcon()
-                    _binding?.let {
+                    binding?.let {
                         it.playerLayout.currentPodcastTitle.text = episode.title
                         it.playerLayout.currentPodcastDescription.text = episode.description
                         it.playerLayout.root.visibility = View.VISIBLE
                     }
                 }
-                setOnErrorListener { _, _, _ ->
-                    Toast.makeText(context, "Playback failed", Toast.LENGTH_SHORT).show()
-                    false
-                }
             } catch (e: Exception) {
-                Toast.makeText(context, "Unable to play episode", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Unable to play", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -16,24 +16,23 @@ import java.net.URL
 
 class PrayerFragment : Fragment(R.layout.fragment_prayer) {
     private var _binding: FragmentPrayerBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentPrayerBinding.bind(view)
-            binding.submitPrayerBtn.setOnClickListener {
-                val name = binding.nameEditText.text.toString().trim()
-                val email = binding.emailEditText.text.toString().trim()
-                val phone = binding.phoneEditText.text.toString().trim()
-                val request = binding.requestEditText.text.toString().trim()
-                if (name.isEmpty() || request.isEmpty()) {
-                    Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                submit(name, email, phone, request)
+        _binding = FragmentPrayerBinding.bind(view)
+        binding?.submitPrayerBtn?.setOnClickListener {
+            val b = binding ?: return@setOnClickListener
+            val name = b.nameEditText.text.toString().trim()
+            val email = b.emailEditText.text.toString().trim()
+            val phone = b.phoneEditText.text.toString().trim()
+            val request = b.requestEditText.text.toString().trim()
+            if (name.isEmpty() || request.isEmpty()) {
+                Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-        } catch (e: Exception) { e.printStackTrace() }
+            submit(name, email, phone, request)
+        }
     }
 
     private fun submit(name: String, email: String, phone: String, request: String) {
@@ -63,8 +62,8 @@ class PrayerFragment : Fragment(R.layout.fragment_prayer) {
             if (!isAdded) return@launch
             Toast.makeText(requireContext(), if (ok) "Prayer request sent!" else "Prayer received in spirit", Toast.LENGTH_SHORT).show()
             if (ok) {
-                binding.nameEditText.text?.clear()
-                binding.requestEditText.text?.clear()
+                binding?.nameEditText?.text?.clear()
+                binding?.requestEditText?.text?.clear()
             }
         }
     }
