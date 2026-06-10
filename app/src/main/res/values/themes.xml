@@ -1,0 +1,28 @@
+<resources>
+    <style name="Theme.KLSRRadio" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#0a0f2d</item>
+        <item name="colorPrimaryDark">#05081a</item>
+        <item name="colorPrimaryLight">#1a235c</item>
+        <item name="colorAccent">#FF5252</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
+    </style>
+
+    <style name="Theme.Splash" parent="Theme.KLSRRadio">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
+    <style name="PlayerButton" parent="Widget.MaterialComponents.Button.IconButton">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:tint">@android:color/white</item>
+        <item name="backgroundTint">@null</item>
+    </style>
+
+    <style name="PlayerButton.Primary" parent="PlayerButton">
+        <item name="android:background">@drawable/circle_red_bg</item>
+        <item name="android:tint">@android:color/white</item>
+    </style>
+</resources>
