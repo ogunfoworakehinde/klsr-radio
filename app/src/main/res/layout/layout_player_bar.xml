@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorPrimaryDark"
+    android:background="#1a235c"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="8dp">
@@ -34,19 +34,31 @@
         android:orientation="horizontal">
         <ImageButton
             android:id="@+id/btn_prev"
-            style="@style/PlayerButton"
-            android:src="@drawable/ic_skip_previous" />
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_skip_previous"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white" />
         <ImageButton
             android:id="@+id/btn_play_pause"
-            style="@style/PlayerButton.Primary"
-            android:src="@drawable/ic_play_arrow" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_play_arrow"
+            android:background="@drawable/circle_red_bg"
+            android:tint="@android:color/white" />
         <ImageButton
             android:id="@+id/btn_next"
-            style="@style/PlayerButton"
-            android:src="@drawable/ic_skip_next" />
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_skip_next"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white" />
         <ImageButton
             android:id="@+id/btn_channel_switcher"
-            style="@style/PlayerButton"
-            android:src="@drawable/ic_tune" />
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_tune"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white" />
     </LinearLayout>
 </LinearLayout>

@@ -2,7 +2,6 @@
     <style name="Theme.KLSRRadio" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">#05081a</item>
         <item name="colorPrimaryDark">#020410</item>
-        <item name="colorPrimaryLight">#0a0f2d</item>
         <item name="colorAccent">#FF5252</item>
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
