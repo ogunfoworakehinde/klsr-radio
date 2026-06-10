@@ -4,7 +4,7 @@
         <TextView android:text="Settings" android:textColor="@android:color/white" android:textSize="24sp" android:textStyle="bold" />
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:padding="8dp">
             <TextView android:text="Dark Mode" android:textColor="@android:color/white" android:layout_width="0dp" android:layout_weight="1" />
-            <Switch android:id="@+id/darkModeSwitch" />
+            <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/darkModeSwitch" android:layout_width="wrap_content" android:layout_height="wrap_content" />
         </LinearLayout>
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:padding="8dp">
             <TextView android:text="Radio Volume" android:textColor="@android:color/white" android:layout_width="0dp" android:layout_weight="1" />

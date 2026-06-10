@@ -16,17 +16,16 @@ import java.net.URL
 
 class PrayerFragment : Fragment(R.layout.fragment_prayer) {
     private var _binding: FragmentPrayerBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPrayerBinding.bind(view)
-        binding?.submitPrayerBtn?.setOnClickListener {
-            val b = binding ?: return@setOnClickListener
-            val name = b.nameEditText.text.toString().trim()
-            val email = b.emailEditText.text.toString().trim()
-            val phone = b.phoneEditText.text.toString().trim()
-            val request = b.requestEditText.text.toString().trim()
+        binding.submitPrayerBtn.setOnClickListener {
+            val name = binding.nameEditText.text.toString().trim()
+            val email = binding.emailEditText.text.toString().trim()
+            val phone = binding.phoneEditText.text.toString().trim()
+            val request = binding.requestEditText.text.toString().trim()
             if (name.isEmpty() || request.isEmpty()) {
                 Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -53,6 +52,8 @@ class PrayerFragment : Fragment(R.layout.fragment_prayer) {
                     }
                     val url = URL("https://api.emailjs.com/api/v1.0/email/send")
                     val conn = url.openConnection() as HttpURLConnection
+                    conn.connectTimeout = 15000
+                    conn.readTimeout = 15000
                     conn.doOutput = true
                     conn.setRequestProperty("Content-Type", "application/json")
                     conn.outputStream.write(json.toString().toByteArray())
@@ -60,10 +61,14 @@ class PrayerFragment : Fragment(R.layout.fragment_prayer) {
                 } catch (e: Exception) { false }
             }
             if (!isAdded) return@launch
-            Toast.makeText(requireContext(), if (ok) "Prayer request sent!" else "Prayer received in spirit", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),
+                if (ok) "Prayer request sent!" else "Prayer received in spirit",
+                Toast.LENGTH_SHORT).show()
             if (ok) {
-                binding?.nameEditText?.text?.clear()
-                binding?.requestEditText?.text?.clear()
+                _binding?.let {
+                    it.nameEditText.text?.clear()
+                    it.requestEditText.text?.clear()
+                }
             }
         }
     }

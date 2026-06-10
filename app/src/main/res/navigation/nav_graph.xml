@@ -3,16 +3,59 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
-    <fragment android:id="@+id/homeFragment" android:name="com.klsr.radio.ui.HomeFragment" android:label="Home" />
-    <fragment android:id="@+id/podcastFragment" android:name="com.klsr.radio.ui.PodcastFragment" android:label="Podcasts" />
-    <fragment android:id="@+id/prayerFragment" android:name="com.klsr.radio.ui.PrayerFragment" android:label="Prayer" />
-    <fragment android:id="@+id/blogFragment" android:name="com.klsr.radio.ui.BlogFragment" android:label="Blog" />
-    <fragment android:id="@+id/singlePostFragment" android:name="com.klsr.radio.ui.SinglePostFragment" android:label="Article">
-        <argument android:name="postId" app:argType="integer" />
+
+    <fragment android:id="@+id/homeFragment"
+        android:name="com.klsr.radio.ui.HomeFragment"
+        android:label="Home" />
+
+    <fragment android:id="@+id/podcastFragment"
+        android:name="com.klsr.radio.ui.PodcastFragment"
+        android:label="Podcasts" />
+
+    <fragment android:id="@+id/prayerFragment"
+        android:name="com.klsr.radio.ui.PrayerFragment"
+        android:label="Prayer" />
+
+    <fragment android:id="@+id/blogFragment"
+        android:name="com.klsr.radio.ui.BlogFragment"
+        android:label="Blog">
+        <action android:id="@+id/action_blog_to_singlePost"
+            app:destination="@id/singlePostFragment" />
     </fragment>
-    <fragment android:id="@+id/aboutFragment" android:name="com.klsr.radio.ui.AboutFragment" android:label="About" />
-    <fragment android:id="@+id/donationFragment" android:name="com.klsr.radio.ui.DonationFragment" android:label="Donate" />
-    <fragment android:id="@+id/contactFragment" android:name="com.klsr.radio.ui.ContactFragment" android:label="Contact" />
-    <fragment android:id="@+id/settingsFragment" android:name="com.klsr.radio.ui.SettingsFragment" android:label="Settings" />
-    <fragment android:id="@+id/moreFragment" android:name="com.klsr.radio.ui.MoreFragment" android:label="More" />
+
+    <fragment android:id="@+id/singlePostFragment"
+        android:name="com.klsr.radio.ui.SinglePostFragment"
+        android:label="Article">
+        <argument android:name="postId" app:argType="integer" android:defaultValue="0" />
+    </fragment>
+
+    <fragment android:id="@+id/moreFragment"
+        android:name="com.klsr.radio.ui.MoreFragment"
+        android:label="More">
+        <action android:id="@+id/action_more_to_about"
+            app:destination="@id/aboutFragment" />
+        <action android:id="@+id/action_more_to_donation"
+            app:destination="@id/donationFragment" />
+        <action android:id="@+id/action_more_to_contact"
+            app:destination="@id/contactFragment" />
+        <action android:id="@+id/action_more_to_settings"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/aboutFragment"
+        android:name="com.klsr.radio.ui.AboutFragment"
+        android:label="About" />
+
+    <fragment android:id="@+id/donationFragment"
+        android:name="com.klsr.radio.ui.DonationFragment"
+        android:label="Donate" />
+
+    <fragment android:id="@+id/contactFragment"
+        android:name="com.klsr.radio.ui.ContactFragment"
+        android:label="Contact" />
+
+    <fragment android:id="@+id/settingsFragment"
+        android:name="com.klsr.radio.ui.SettingsFragment"
+        android:label="Settings" />
+
 </navigation>

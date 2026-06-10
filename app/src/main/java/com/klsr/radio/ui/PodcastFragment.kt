@@ -11,7 +11,6 @@ import com.klsr.radio.R
 import com.klsr.radio.adapters.PodcastAdapter
 import com.klsr.radio.data.PodcastEpisode
 import com.klsr.radio.databinding.FragmentPodcastBinding
-import com.klsr.radio.utils.SafeImageHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,7 +26,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPodcastBinding.bind(view)
         binding?.let { b ->
-            SafeImageHelper.load(context, b.podcastHeroImage, R.drawable.hepp)
+            try { b.podcastHeroImage.setImageResource(R.drawable.hepp) } catch (_: Exception) {}
             b.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             loadPodcasts()
             b.playerLayout.btnPodcastPlayPause.setOnClickListener {
