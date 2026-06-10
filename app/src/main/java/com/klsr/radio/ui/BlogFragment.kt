@@ -5,9 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
@@ -15,15 +13,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.klsr.radio.R
 import com.klsr.radio.adapters.BlogPostAdapter
+import com.klsr.radio.adapters.BlogHeroAdapter
 import com.klsr.radio.data.BlogPost
 import com.klsr.radio.data.BlogPostResponse
 import com.klsr.radio.databinding.FragmentBlogBinding
-import com.klsr.radio.databinding.ItemBlogHeroSlideBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -94,7 +91,6 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
         }
         binding.blogHeroViewPager.adapter = adapter
 
-        // Dots
         val dotsLayout = binding.blogHeroDots
         dotsLayout.removeAllViews()
         for (i in heroPosts.indices) {
@@ -176,34 +172,5 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
         super.onDestroyView()
         heroRunnable?.let { handler.removeCallbacks(it) }
         _binding = null
-    }
-}
-
-// Hero adapter
-class BlogHeroAdapter(
-    private val posts: List<BlogPost>,
-    private val onClick: (Int) -> Unit
-) : RecyclerView.Adapter<BlogHeroAdapter.VH>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val binding = ItemBlogHeroSlideBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return VH(binding)
-    }
-
-    override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.bind(posts[position])
-    }
-
-    override fun getItemCount() = posts.size
-
-    inner class VH(private val b: ItemBlogHeroSlideBinding) : RecyclerView.ViewHolder(b.root) {
-        fun bind(post: BlogPost) {
-            b.heroTitle.text = post.title
-            b.heroDate.text = post.date
-            post.featuredMediaUrl?.let {
-                Glide.with(b.root.context).load(it).into(b.heroImage)
-            }
-            b.heroReadMoreBtn.setOnClickListener { onClick(post.id) }
-        }
     }
 }
