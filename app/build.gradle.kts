@@ -28,8 +28,6 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    vectorDrawables {
-        useSupportLibrary = true
     }
 }
 dependencies {
