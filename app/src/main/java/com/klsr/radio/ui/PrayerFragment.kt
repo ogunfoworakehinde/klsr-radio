@@ -21,23 +21,22 @@ class PrayerFragment : Fragment(R.layout.fragment_prayer) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPrayerBinding.bind(view)
-
         binding.submitPrayerBtn.setOnClickListener {
-            val name = binding.nameEditText.text.toString()
-            val email = binding.emailEditText.text.toString()
-            val phone = binding.phoneEditText.text.toString()
-            val request = binding.requestEditText.text.toString()
-            if (name.isBlank() || request.isBlank()) {
-                Toast.makeText(requireContext(), "Please fill required fields", Toast.LENGTH_SHORT).show()
+            val name = binding.nameEditText.text.toString().trim()
+            val email = binding.emailEditText.text.toString().trim()
+            val phone = binding.phoneEditText.text.toString().trim()
+            val request = binding.requestEditText.text.toString().trim()
+            if (name.isEmpty() || request.isEmpty()) {
+                Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            submitPrayer(name, email, phone, request)
+            submit(name, email, phone, request)
         }
     }
 
-    private fun submitPrayer(name: String, email: String, phone: String, request: String) {
+    private fun submit(name: String, email: String, phone: String, request: String) {
         lifecycleScope.launch {
-            val success = withContext(Dispatchers.IO) {
+            val ok = withContext(Dispatchers.IO) {
                 try {
                     val json = JSONObject().apply {
                         put("service_id", "service_bg462kr")
@@ -49,7 +48,6 @@ class PrayerFragment : Fragment(R.layout.fragment_prayer) {
                             put("from_email", email)
                             put("phone", phone)
                             put("message", request)
-                            put("followup", binding.followupCheckBox.isChecked)
                         })
                     }
                     val url = URL("https://api.emailjs.com/api/v1.0/email/send")
@@ -58,18 +56,12 @@ class PrayerFragment : Fragment(R.layout.fragment_prayer) {
                     conn.setRequestProperty("Content-Type", "application/json")
                     conn.outputStream.write(json.toString().toByteArray())
                     conn.responseCode == 200
-                } catch (e: Exception) {
-                    false
-                }
+                } catch (e: Exception) { false }
             }
-            if (success) {
-                Toast.makeText(requireContext(), "Prayer request sent!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), if (ok) "Prayer request sent!" else "Prayer received in spirit", Toast.LENGTH_SHORT).show()
+            if (ok) {
                 binding.nameEditText.text?.clear()
-                binding.emailEditText.text?.clear()
-                binding.phoneEditText.text?.clear()
                 binding.requestEditText.text?.clear()
-            } else {
-                Toast.makeText(requireContext(), "Failed, but your prayer is heard.", Toast.LENGTH_SHORT).show()
             }
         }
     }

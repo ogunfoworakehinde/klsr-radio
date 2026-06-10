@@ -18,17 +18,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentSettingsBinding.bind(view)
         prefs = requireContext().getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
-
         binding.darkModeSwitch.isChecked = prefs.getBoolean("dark_mode", false)
         binding.volumeSeekBar.progress = prefs.getInt("volume", 100)
-
         binding.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("dark_mode", isChecked).apply()
             AppCompatDelegate.setDefaultNightMode(
                 if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
             )
         }
-
         binding.saveSettingsBtn.setOnClickListener {
             prefs.edit().putInt("volume", binding.volumeSeekBar.progress).apply()
             Toast.makeText(requireContext(), "Settings saved", Toast.LENGTH_SHORT).show()

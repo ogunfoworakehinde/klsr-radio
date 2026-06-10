@@ -6,5 +6,6 @@ data class PodcastEpisode(
     var imageUrl: String? = null,
     var audioUrl: String? = null,
     var pubDate: String? = null,
-    var duration: String? = null
+    var duration: String? = null,
+    var author: String? = null
 )

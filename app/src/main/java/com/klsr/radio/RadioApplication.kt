@@ -8,12 +8,11 @@ class RadioApplication : Application() {
         super.onCreate()
         try {
             val prefs = getSharedPreferences("settings", MODE_PRIVATE)
-            val isDark = prefs.getBoolean("dark_mode", false)
+            val dark = prefs.getBoolean("dark_mode", false)
             AppCompatDelegate.setDefaultNightMode(
-                if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+                if (dark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
             )
-        } catch (e: Exception) {
-            // If anything goes wrong, stay with light theme
+        } catch (_: Exception) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
     }

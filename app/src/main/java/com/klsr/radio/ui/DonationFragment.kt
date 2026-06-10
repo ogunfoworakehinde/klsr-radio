@@ -17,21 +17,14 @@ class DonationFragment : Fragment(R.layout.fragment_donation) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDonationBinding.bind(view)
-
-        binding.copyZenithBtn.setOnClickListener {
-            copyText("1229216755")
-        }
-        binding.copyGtbankNgnBtn.setOnClickListener {
-            copyText("0892125365")
-        }
-        binding.copyGtbankUsdBtn.setOnClickListener {
-            copyText("0892172060")
-        }
+        binding.copyZenithBtn.setOnClickListener { copy("1229216755") }
+        binding.copyGtbankNgnBtn.setOnClickListener { copy("0892125365") }
+        binding.copyGtbankUsdBtn.setOnClickListener { copy("0892172060") }
     }
 
-    private fun copyText(text: String) {
-        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("account", text))
+    private fun copy(text: String) {
+        val cm = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        cm.setPrimaryClip(ClipData.newPlainText("account", text))
         Toast.makeText(requireContext(), "Copied: $text", Toast.LENGTH_SHORT).show()
     }
 

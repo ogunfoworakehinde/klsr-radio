@@ -6,5 +6,6 @@ data class BlogPost(
     val excerpt: String,
     val date: String,
     val featuredMediaUrl: String?,
-    val authorName: String
+    val authorName: String,
+    val content: String = ""
 )

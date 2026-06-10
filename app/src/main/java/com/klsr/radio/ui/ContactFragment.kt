@@ -1,5 +1,7 @@
 package com.klsr.radio.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -21,23 +23,44 @@ class ContactFragment : Fragment(R.layout.fragment_contact) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentContactBinding.bind(view)
-
         binding.sendContactBtn.setOnClickListener {
-            val name = binding.contactNameEditText.text.toString()
-            val email = binding.contactEmailEditText.text.toString()
-            val subject = binding.contactSubjectEditText.text.toString()
-            val message = binding.contactMessageEditText.text.toString()
-            if (name.isBlank() || email.isBlank() || message.isBlank()) {
-                Toast.makeText(requireContext(), "Please fill required fields", Toast.LENGTH_SHORT).show()
+            val name = binding.contactNameEditText.text.toString().trim()
+            val email = binding.contactEmailEditText.text.toString().trim()
+            val subject = binding.contactSubjectEditText.text.toString().trim()
+            val msg = binding.contactMessageEditText.text.toString().trim()
+            if (name.isEmpty() || email.isEmpty() || msg.isEmpty()) {
+                Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            sendMessage(name, email, subject, message)
+            sendEmailJS(name, email, subject, msg)
+        }
+        // Social media buttons
+        binding.btnWhatsapp.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/2349160006614")))
+        }
+        binding.btnFacebook.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/kingdomLifestyleradio/")))
+        }
+        binding.btnTwitter.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/kingdomlifestr")))
+        }
+        binding.btnInstagram.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/kingdom.lifestyleradio")))
+        }
+        binding.btnYoutube.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://m.youtube.com/channel/UC64-kfcZkFuIi83pPqFpECQ")))
+        }
+        binding.btnTelegram.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/kingdomlifestyleradio")))
+        }
+        binding.btnWebsite.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://kingdomlifestyleradio.com")))
         }
     }
 
-    private fun sendMessage(name: String, email: String, subject: String, message: String) {
+    private fun sendEmailJS(name: String, email: String, subject: String, message: String) {
         lifecycleScope.launch {
-            val success = withContext(Dispatchers.IO) {
+            val ok = withContext(Dispatchers.IO) {
                 try {
                     val json = JSONObject().apply {
                         put("service_id", "service_bg462kr")
@@ -57,18 +80,14 @@ class ContactFragment : Fragment(R.layout.fragment_contact) {
                     conn.setRequestProperty("Content-Type", "application/json")
                     conn.outputStream.write(json.toString().toByteArray())
                     conn.responseCode == 200
-                } catch (e: Exception) {
-                    false
-                }
+                } catch (e: Exception) { false }
             }
-            if (success) {
-                Toast.makeText(requireContext(), "Message sent!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), if (ok) "Message sent!" else "We'll get back to you.", Toast.LENGTH_SHORT).show()
+            if (ok) {
                 binding.contactNameEditText.text?.clear()
                 binding.contactEmailEditText.text?.clear()
                 binding.contactSubjectEditText.text?.clear()
                 binding.contactMessageEditText.text?.clear()
-            } else {
-                Toast.makeText(requireContext(), "Failed, try again later", Toast.LENGTH_SHORT).show()
             }
         }
     }

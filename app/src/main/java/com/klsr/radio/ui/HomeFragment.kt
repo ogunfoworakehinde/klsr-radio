@@ -20,12 +20,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val handler = Handler(Looper.getMainLooper())
-    private var autoSlideRunnable: Runnable? = null
+    private var runnable: Runnable? = null
     private var currentSlide = 0
-    private lateinit var sliderAdapter: HeroSliderAdapter
-    private val images = listOf(
-        R.drawable.herr1, R.drawable.herr2, R.drawable.herr3, R.drawable.herr4
-    )
+    private val images = listOf(R.drawable.herr1, R.drawable.herr2, R.drawable.herr3, R.drawable.herr4)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -34,11 +31,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        sliderAdapter = HeroSliderAdapter(images)
-        binding.heroViewPager.adapter = sliderAdapter
-
-        // Dots indicator
+        val adapter = HeroSliderAdapter(images)
+        binding.heroViewPager.adapter = adapter
         val dotsLayout: LinearLayout = binding.dotsLayout
         dotsLayout.removeAllViews()
         for (i in images.indices) {
@@ -48,7 +42,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
             dotsLayout.addView(dot)
         }
-
         binding.heroViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 currentSlide = position
@@ -57,27 +50,21 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         if (i == position) R.drawable.dot_active else R.drawable.dot_inactive
                     )
                 }
-                startAutoSlide() // restart timer
+                startAutoSlide()
             }
         })
-
         binding.btnListenLive.setOnClickListener {
-            val intent = Intent(requireContext(), RadioService::class.java).apply {
-                putExtra(RadioService.EXTRA_STATION_INDEX, 0)
-            }
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                requireContext().startForegroundService(intent)
-            } else {
-                requireContext().startService(intent)
-            }
+            val i = Intent(requireContext(), RadioService::class.java).apply { putExtra(RadioService.EXTRA_STATION_INDEX, 0) }
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                requireContext().startForegroundService(i)
+            else requireContext().startService(i)
         }
-
         startAutoSlide()
     }
 
     private fun startAutoSlide() {
-        autoSlideRunnable?.let { handler.removeCallbacks(it) }
-        val runnable = object : Runnable {
+        runnable?.let { handler.removeCallbacks(it) }
+        val r = object : Runnable {
             override fun run() {
                 if (binding.heroViewPager.adapter != null) {
                     currentSlide = (currentSlide + 1) % images.size
@@ -86,13 +73,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 handler.postDelayed(this, 4000)
             }
         }
-        autoSlideRunnable = runnable
-        handler.postDelayed(runnable, 4000)
+        runnable = r
+        handler.postDelayed(r, 4000)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        autoSlideRunnable?.let { handler.removeCallbacks(it) }
+        runnable?.let { handler.removeCallbacks(it) }
         _binding = null
     }
 }

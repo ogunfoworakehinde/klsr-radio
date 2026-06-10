@@ -1,21 +1,23 @@
 package com.klsr.radio.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.klsr.radio.R
+import com.klsr.radio.databinding.FragmentAboutBinding
 
 class AboutFragment : Fragment(R.layout.fragment_about) {
+    private var _binding: FragmentAboutBinding? = null
+    private val binding get() = _binding!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Team member images (loaded from drawable)
-        view.findViewById<ImageView>(R.id.imageTeam1).setImageResource(R.drawable.team1)
-        view.findViewById<ImageView>(R.id.imageTeam2).setImageResource(R.drawable.manager)
-        view.findViewById<ImageView>(R.id.imageTeam3).setImageResource(R.drawable.voice)
+        _binding = FragmentAboutBinding.bind(view)
+        // team images are set directly in layout via srcCompat
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

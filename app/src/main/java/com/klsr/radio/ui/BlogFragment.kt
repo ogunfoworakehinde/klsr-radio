@@ -3,12 +3,13 @@ package com.klsr.radio.ui
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.klsr.radio.R
 import com.klsr.radio.adapters.BlogPostAdapter
 import com.klsr.radio.data.BlogPost
@@ -16,7 +17,6 @@ import com.klsr.radio.databinding.FragmentBlogBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -29,28 +29,16 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentBlogBinding.bind(view)
-            binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            loadPosts(1)
-
-            binding.searchEditText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    filterPosts(s?.toString() ?: "")
-                }
-                override fun afterTextChanged(s: Editable?) {}
-            })
-
-            binding.paginationControls.prevPageBtn.setOnClickListener {
-                if (currentPage > 1) loadPosts(currentPage - 1)
-            }
-            binding.paginationControls.nextPageBtn.setOnClickListener {
-                if (currentPage < totalPages) loadPosts(currentPage + 1)
-            }
-        } catch (e: Exception) {
-            Log.e("BlogFragment", "onViewCreated failed", e)
-        }
+        _binding = FragmentBlogBinding.bind(view)
+        binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        loadPosts(1)
+        binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) { filter(s?.toString() ?: "") }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+        binding.paginationControls.prevPageBtn.setOnClickListener { if (currentPage > 1) loadPosts(currentPage - 1) }
+        binding.paginationControls.nextPageBtn.setOnClickListener { if (currentPage < totalPages) loadPosts(currentPage + 1) }
     }
 
     private fun loadPosts(page: Int) {
@@ -60,40 +48,32 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
                     val url = URL("https://kingdomlifestyleradio.com/wp/wp-json/wp/v2/posts?per_page=6&page=$page&_embed")
                     val conn = url.openConnection() as HttpURLConnection
                     val json = conn.inputStream.bufferedReader().readText()
-                    val arr = JSONArray(json)
-                    val posts = mutableListOf<BlogPost>()
-                    for (i in 0 until arr.length()) {
-                        val obj = arr.getJSONObject(i)
-                        val id = obj.getInt("id")
-                        val title = obj.getJSONObject("title").getString("rendered")
-                        val excerpt = obj.getJSONObject("excerpt").getString("rendered").replace(Regex("<[^>]+>"), "")
-                        val date = obj.getString("date").substring(0, 10)
-                        val imageUrl = obj.optJSONObject("_embedded")?.optJSONArray("wp:featuredmedia")
-                            ?.optJSONObject(0)?.optString("source_url")
-                        val author = obj.optJSONObject("_embedded")?.optJSONArray("author")
-                            ?.optJSONObject(0)?.optString("name") ?: "Admin"
-                        posts.add(BlogPost(id, title, excerpt, date, imageUrl, author))
+                    val listType = TypeToken.getParameterized(List::class.java, BlogPostResponse::class.java).type
+                    val posts: List<BlogPostResponse> = Gson().fromJson(json, listType)
+                    val total = conn.getHeaderField("X-WP-TotalPages")?.toIntOrNull() ?: 1
+                    val items = posts.map { p ->
+                        val imgUrl = p._embedded?.get("wp:featuredmedia")?.getOrNull(0)?.source_url
+                        BlogPost(p.id, p.title.rendered, p.excerpt.rendered.replace(Regex("<[^>]+>"), "").take(150) + "...",
+                            p.date.take(10), imgUrl, p._embedded?.get("author")?.getOrNull(0)?.name ?: "Admin", p.content.rendered)
                     }
-                    totalPages = conn.getHeaderField("X-WP-TotalPages")?.toIntOrNull() ?: 1
-                    currentPage = page
-                    Pair(posts, totalPages)
+                    Pair(items, total)
                 } catch (e: Exception) {
-                    Log.e("BlogFragment", "API load failed", e)
                     Pair(emptyList<BlogPost>(), 1)
                 }
             }
             allPosts = result.first
+            totalPages = result.second
+            currentPage = page
             binding.blogRecyclerView.adapter = BlogPostAdapter(allPosts) { postId ->
                 findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
             }
-            binding.paginationControls.pageIndicator.text = "Page $currentPage of $totalPages"
+            binding.paginationControls.pageIndicator.text = "Page $page of $totalPages"
             binding.paginationControls.root.visibility = if (totalPages > 1) View.VISIBLE else View.GONE
         }
     }
 
-    private fun filterPosts(query: String) {
-        val filtered = if (query.isBlank()) allPosts
-        else allPosts.filter { it.title.contains(query, ignoreCase = true) || it.excerpt.contains(query, ignoreCase = true) }
+    private fun filter(query: String) {
+        val filtered = if (query.isBlank()) allPosts else allPosts.filter { it.title.contains(query, ignoreCase = true) || it.excerpt.contains(query, ignoreCase = true) }
         binding.blogRecyclerView.adapter = BlogPostAdapter(filtered) { postId ->
             findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
         }
@@ -104,3 +84,22 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
         _binding = null
     }
 }
+
+// JSON mapping classes
+data class BlogPostResponse(
+    val id: Int,
+    val title: Title,
+    val excerpt: Excerpt,
+    val date: String,
+    val content: Content,
+    val _embedded: Embedded?
+)
+data class Title(val rendered: String)
+data class Excerpt(val rendered: String)
+data class Content(val rendered: String)
+data class Embedded(
+    val `wp:featuredmedia`: List<Media>?,
+    val author: List<Author>?
+)
+data class Media(val source_url: String?)
+data class Author(val name: String?)

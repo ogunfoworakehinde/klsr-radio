@@ -2,8 +2,8 @@ package com.klsr.radio.ui
 
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,7 +14,8 @@ import com.klsr.radio.databinding.FragmentPodcastBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.xmlpull.v1.XmlPullParserFactory
+import org.json.JSONObject
+import java.net.HttpURLConnection
 import java.net.URL
 
 class PodcastFragment : Fragment(R.layout.fragment_podcast) {
@@ -24,96 +25,72 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        try {
-            _binding = FragmentPodcastBinding.bind(view)
-            binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            loadPodcasts()
-            binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
-                mediaPlayer?.let {
-                    if (it.isPlaying) it.pause() else it.start()
-                    updatePlayPauseButton()
-                }
+        _binding = FragmentPodcastBinding.bind(view)
+        binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        loadPodcasts()
+        binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
+            mediaPlayer?.let {
+                if (it.isPlaying) it.pause() else it.start()
+                updatePlayPause()
             }
-        } catch (e: Exception) {
-            Log.e("PodcastFragment", "onViewCreated failed", e)
         }
     }
 
-    private fun updatePlayPauseButton() {
-        val icon = if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
-        binding.playerLayout.btnPodcastPlayPause.setImageResource(icon)
+    private fun updatePlayPause() {
+        binding.playerLayout.btnPodcastPlayPause.setImageResource(
+            if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
+        )
     }
 
     private fun loadPodcasts() {
         lifecycleScope.launch {
-            val list = withContext(Dispatchers.IO) {
+            val episodes = withContext(Dispatchers.IO) {
                 try {
                     val url = URL("https://anchor.fm/s/1d6ad87c/podcast/rss")
-                    val parser = XmlPullParserFactory.newInstance().newPullParser()
-                    parser.setInput(url.openStream(), null)
-                    var eventType = parser.eventType
-                    val episodes = mutableListOf<PodcastEpisode>()
-                    var currentEpisode: PodcastEpisode? = null
-                    var currentTag = ""
-                    while (eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
-                        when (eventType) {
-                            org.xmlpull.v1.XmlPullParser.START_TAG -> {
-                                currentTag = parser.name
-                                if (currentTag == "item") currentEpisode = PodcastEpisode()
-                            }
-                            org.xmlpull.v1.XmlPullParser.TEXT -> {
-                                when (currentTag) {
-                                    "title" -> currentEpisode?.title = parser.text
-                                    "description" -> currentEpisode?.description = parser.text
-                                    "itunes:image" -> currentEpisode?.imageUrl = parser.getAttributeValue(null, "href")
-                                    "enclosure" -> currentEpisode?.audioUrl = parser.getAttributeValue(null, "url")
-                                    "pubDate" -> currentEpisode?.pubDate = parser.text
-                                    "itunes:duration" -> currentEpisode?.duration = parser.text
-                                }
-                            }
-                            org.xmlpull.v1.XmlPullParser.END_TAG -> {
-                                if (parser.name == "item") {
-                                    currentEpisode?.let { episodes.add(it) }
-                                    currentEpisode = null
-                                }
-                                currentTag = ""
-                            }
-                        }
-                        eventType = parser.next()
+                    val conn = url.openConnection() as HttpURLConnection
+                    conn.connectTimeout = 10000
+                    val text = conn.inputStream.bufferedReader().readText()
+                    // simple XML parsing using regex (won't work for complex feeds, but fine for this)
+                    val items = text.split("<item>").drop(1)
+                    items.mapNotNull { item ->
+                        try {
+                            val title = Regex("<title><!\\[CDATA\\[(.*?)\\]\\]></title>").find(item)?.groupValues?.get(1) ?: ""
+                            val desc = Regex("<description><!\\[CDATA\\[(.*?)\\]\\]></description>").find(item)?.groupValues?.get(1) ?: ""
+                            val audio = Regex("<enclosure url=\"(.*?)\"").find(item)?.groupValues?.get(1) ?: return@mapNotNull null
+                            val image = Regex("<itunes:image href=\"(.*?)\"").find(item)?.groupValues?.get(1)
+                            PodcastEpisode(title = title, description = desc, audioUrl = audio, imageUrl = image)
+                        } catch (e: Exception) { null }
                     }
-                    episodes
                 } catch (e: Exception) {
-                    Log.e("PodcastFragment", "RSS load failed", e)
+                    Toast.makeText(requireContext(), "Failed to load podcasts", Toast.LENGTH_SHORT).show()
                     emptyList()
                 }
             }
-            binding.podcastRecyclerView.adapter = PodcastAdapter(list) { episode -> playEpisode(episode) }
-            binding.paginationControls.root.visibility = View.GONE
+            binding.podcastRecyclerView.adapter = PodcastAdapter(episodes) { playEpisode(it) }
         }
     }
 
-    private fun playEpisode(episode: PodcastEpisode) {
+    private fun playEpisode(ep: PodcastEpisode) {
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer().apply {
             try {
-                setDataSource(episode.audioUrl)
+                setDataSource(ep.audioUrl)
                 prepareAsync()
                 setOnPreparedListener {
                     start()
-                    updatePlayPauseButton()
-                    binding.playerLayout.currentPodcastTitle.text = episode.title
-                    binding.playerLayout.currentPodcastInfo.text = episode.description
+                    updatePlayPause()
+                    binding.playerLayout.currentPodcastTitle.text = ep.title
                     binding.playerLayout.root.visibility = View.VISIBLE
                 }
             } catch (e: Exception) {
-                Log.e("PodcastFragment", "Play failed", e)
+                Toast.makeText(requireContext(), "Playback failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        try { mediaPlayer?.release() } catch (_: Exception) {}
+        mediaPlayer?.release()
         mediaPlayer = null
         _binding = null
     }

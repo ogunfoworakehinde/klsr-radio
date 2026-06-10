@@ -1,23 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?attr/colorPrimary">
-
-    <include
-        android:id="@+id/playerLayout"
-        layout="@layout/podcast_player" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/podcastRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="8dp" />
-
-    <include
-        android:id="@+id/paginationControls"
-        layout="@layout/pagination_controls" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="?attr/colorPrimary">
+    <include android:id="@+id/playerLayout" layout="@layout/podcast_player" />
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/podcastRecyclerView" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
 </LinearLayout>
