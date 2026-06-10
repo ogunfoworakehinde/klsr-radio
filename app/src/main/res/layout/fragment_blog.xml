@@ -37,5 +37,5 @@
         android:clipToPadding="false"
         android:padding="8dp" />
 
-    <include layout="@layout/pagination_controls" />
+    <include android:id="@+id/paginationControls" layout="@layout/pagination_controls" />
 </LinearLayout>

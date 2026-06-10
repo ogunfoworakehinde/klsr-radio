@@ -30,6 +30,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
         binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         loadPodcasts()
 
+        // The player layout is included with id 'playerLayout' (generated binding is playerLayout)
         binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
             mediaPlayer?.let {
                 if (it.isPlaying) it.pause() else it.start()
@@ -89,7 +90,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
             binding.podcastRecyclerView.adapter = PodcastAdapter(list) { episode ->
                 playEpisode(episode)
             }
-            binding.paginationLayout.visibility = View.GONE
+            binding.paginationControls.root.visibility = View.GONE
         }
     }
 
@@ -104,7 +105,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     updatePlayPauseButton()
                     binding.playerLayout.currentPodcastTitle.text = episode.title
                     binding.playerLayout.currentPodcastInfo.text = episode.description
-                    binding.playerLayout.visibility = View.VISIBLE
+                    binding.playerLayout.root.visibility = View.VISIBLE
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

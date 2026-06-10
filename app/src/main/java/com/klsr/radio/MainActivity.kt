@@ -17,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.common.util.concurrent.MoreExecutors
 import com.klsr.radio.databinding.ActivityMainBinding
+import com.klsr.radio.ui.ChannelSwitcherFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -47,14 +48,16 @@ class MainActivity : AppCompatActivity() {
         val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
         controllerFuture.addListener({
             mediaController = controllerFuture.get()
-            mediaController?.player?.addListener(PlayerListener())
-            updatePlayerBar(mediaController)
+            mediaController?.let { mc ->
+                mc.addListener(PlayerListener())
+                updatePlayerBar(mc)
+            }
         }, MoreExecutors.directExecutor())
 
         // Player bar buttons
         binding.playerBar.btnPlayPause.setOnClickListener {
-            mediaController?.player?.let {
-                if (it.isPlaying) it.pause() else it.play()
+            mediaController?.let { mc ->
+                if (mc.isPlaying) mc.pause() else mc.play()
             }
         }
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
@@ -86,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         val station = RadioService.STATIONS[appState.currentStation]
         binding.playerBar.stationName.text = station.name
         binding.playerBar.stationDesc.text = station.description
-        val icon = if (mc?.player?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
+        val icon = if (mc?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
         binding.playerBar.btnPlayPause.setImageResource(icon)
     }
 
@@ -95,7 +98,6 @@ class MainActivity : AppCompatActivity() {
             updatePlayerBar(mediaController)
         }
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            // Update current station index when media item changes
             val index = RadioService.STATIONS.indexOfFirst { it.url == mediaItem?.localConfiguration?.uri.toString() }
             if (index != -1) appState.currentStation = index
             updatePlayerBar(mediaController)

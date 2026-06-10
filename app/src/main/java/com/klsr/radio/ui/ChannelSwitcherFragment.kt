@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.klsr.radio.R
 import com.klsr.radio.RadioService
 
 class ChannelSwitcherFragment(private val onSelected: (Int) -> Unit) : BottomSheetDialogFragment() {
@@ -22,7 +21,7 @@ class ChannelSwitcherFragment(private val onSelected: (Int) -> Unit) : BottomShe
             val tv = TextView(requireContext()).apply {
                 text = station.name
                 setPadding(0, 16, 0, 16)
-                setTextAppearance(R.style.TextAppearance_MaterialComponents_Subtitle1)
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_MaterialComponents_Subtitle1)
                 setOnClickListener {
                     onSelected(index)
                     dismiss()

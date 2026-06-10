@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:background="?attr/colorPrimary">
 
-    <include layout="@layout/podcast_player" />
+    <include android:id="@+id/paginationControls" layout="@layout/podcast_player" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/podcastRecyclerView"
@@ -14,5 +14,5 @@
         android:clipToPadding="false"
         android:padding="8dp" />
 
-    <include layout="@layout/pagination_controls" />
+    <include android:id="@+id/paginationControls" layout="@layout/pagination_controls" />
 </LinearLayout>

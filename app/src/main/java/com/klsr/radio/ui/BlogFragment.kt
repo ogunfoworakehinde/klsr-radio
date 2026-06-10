@@ -42,8 +42,8 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        binding.prevPageBtn.setOnClickListener { if (currentPage > 1) loadPosts(currentPage - 1) }
-        binding.nextPageBtn.setOnClickListener { if (currentPage < totalPages) loadPosts(currentPage + 1) }
+        binding.paginationControls.prevPageBtn.setOnClickListener { if (currentPage > 1) loadPosts(currentPage - 1) }
+        binding.paginationControls.nextPageBtn.setOnClickListener { if (currentPage < totalPages) loadPosts(currentPage + 1) }
     }
 
     private fun loadPosts(page: Int) {
@@ -80,8 +80,8 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
             binding.blogRecyclerView.adapter = BlogPostAdapter(allPosts) { postId ->
                 findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
             }
-            binding.pageIndicator.text = "Page $currentPage of $totalPages"
-            binding.paginationLayout.visibility = if (totalPages > 1) View.VISIBLE else View.GONE
+            binding.paginationControls.pageIndicator.text = "Page $currentPage of $totalPages"
+            binding.paginationControls.root.visibility = if (totalPages > 1) View.VISIBLE else View.GONE
         }
     }
 
