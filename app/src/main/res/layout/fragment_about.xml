@@ -65,7 +65,7 @@
                     android:scaleType="centerCrop"
                     android:background="@drawable/circle_red_bg" />
                 <TextView android:text="Lekan Oleyede" android:textColor="@android:color/white" android:textSize="12sp" />
-                <TextView android:text="Founder & Director" android:textColor="#B3FFFFFF" android:textSize="10sp" />
+                <TextView android:text="Founder &amp; Director" android:textColor="#B3FFFFFF" android:textSize="10sp" />
             </LinearLayout>
 
             <LinearLayout
