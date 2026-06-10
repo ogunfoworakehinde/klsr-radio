@@ -16,11 +16,9 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-class ContactFragment : SafeFragment(R.layout.fragment_contact) {
+class ContactFragment : Fragment(R.layout.fragment_contact) {
     private var _binding: FragmentContactBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
             _binding = FragmentContactBinding.bind(view)
@@ -44,7 +42,6 @@ class ContactFragment : SafeFragment(R.layout.fragment_contact) {
             binding.btnWebsite.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://kingdomlifestyleradio.com"))) }
         } catch (e: Exception) { e.printStackTrace() }
     }
-
     private fun sendEmailJS(name: String, email: String, subject: String, message: String) {
         lifecycleScope.launch {
             val ok = withContext(Dispatchers.IO) {
@@ -69,16 +66,18 @@ class ContactFragment : SafeFragment(R.layout.fragment_contact) {
                     conn.responseCode == 200
                 } catch (e: Exception) { false }
             }
+            if (!isAdded) return@launch
             Toast.makeText(requireContext(), if (ok) "Message sent!" else "We'll get back to you.", Toast.LENGTH_SHORT).show()
             if (ok) {
-                binding.contactNameEditText.text?.clear()
-                binding.contactEmailEditText.text?.clear()
-                binding.contactSubjectEditText.text?.clear()
-                binding.contactMessageEditText.text?.clear()
+                _binding?.let {
+                    it.contactNameEditText.text?.clear()
+                    it.contactEmailEditText.text?.clear()
+                    it.contactSubjectEditText.text?.clear()
+                    it.contactMessageEditText.text?.clear()
+                }
             }
         }
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

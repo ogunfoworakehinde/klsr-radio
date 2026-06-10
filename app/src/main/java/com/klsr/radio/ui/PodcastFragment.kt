@@ -4,6 +4,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.klsr.radio.R
@@ -16,35 +17,35 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 
-class PodcastFragment : SafeFragment(R.layout.fragment_podcast) {
+class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     private var _binding: FragmentPodcastBinding? = null
     private val binding get() = _binding!!
     private var mediaPlayer: MediaPlayer? = null
-    private var currentEpisode: PodcastEpisode? = null
 
-    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
-        _binding = FragmentPodcastBinding.bind(view)
-        binding.podcastHeroImage.setImageResource(R.drawable.hepp)
-        binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        loadPodcasts()
-        binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
-            currentEpisode?.let { ep ->
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        try {
+            _binding = FragmentPodcastBinding.bind(view)
+            binding.podcastHeroImage.setImageResource(R.drawable.hepp)
+            binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            loadPodcasts()
+
+            binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
                 mediaPlayer?.let { mp ->
-                    if (mp.isPlaying) {
-                        mp.pause()
-                        updatePlayPauseIcon(false)
-                    } else {
-                        mp.start()
-                        updatePlayPauseIcon(true)
-                    }
-                } ?: playEpisode(ep)
+                    if (mp.isPlaying) mp.pause() else mp.start()
+                    updatePlayPauseIcon()
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    private fun updatePlayPauseIcon(isPlaying: Boolean) {
-        val icon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
-        binding.playerLayout.btnPodcastPlayPause.setImageResource(icon)
+    private fun updatePlayPauseIcon() {
+        _binding?.let {
+            val icon = if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
+            it.playerLayout.btnPodcastPlayPause.setImageResource(icon)
+        }
     }
 
     private fun loadPodcasts() {
@@ -67,32 +68,38 @@ class PodcastFragment : SafeFragment(R.layout.fragment_podcast) {
                     }
                 } catch (e: Exception) { emptyList() }
             }
-            binding.podcastRecyclerView.adapter = PodcastAdapter(episodes) { episode -> playEpisode(episode) }
+            if (!isAdded) return@launch
+            _binding?.let {
+                it.podcastRecyclerView.adapter = PodcastAdapter(episodes) { episode -> playEpisode(episode) }
+            }
         }
     }
 
     private fun playEpisode(episode: PodcastEpisode) {
+        if (!isAdded) return
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer().apply {
             try {
                 setDataSource(episode.audioUrl)
                 prepareAsync()
                 setOnPreparedListener {
+                    if (!isAdded) return@setOnPreparedListener
                     start()
-                    updatePlayPauseIcon(true)
-                    binding.playerLayout.currentPodcastTitle.text = episode.title
-                    binding.playerLayout.currentPodcastDescription.text = episode.description
-                    binding.playerLayout.root.visibility = View.VISIBLE
+                    updatePlayPauseIcon()
+                    _binding?.let {
+                        it.playerLayout.currentPodcastTitle.text = episode.title
+                        it.playerLayout.currentPodcastDescription.text = episode.description
+                        it.playerLayout.root.visibility = View.VISIBLE
+                    }
                 }
                 setOnErrorListener { _, _, _ ->
-                    Toast.makeText(requireContext(), "Playback failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Playback failed", Toast.LENGTH_SHORT).show()
                     false
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Unable to play episode", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Unable to play episode", Toast.LENGTH_SHORT).show()
             }
         }
-        currentEpisode = episode
     }
 
     override fun onDestroyView() {

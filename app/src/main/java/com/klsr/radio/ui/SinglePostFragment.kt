@@ -3,6 +3,7 @@ package com.klsr.radio.ui
 import android.os.Bundle
 import android.text.Html
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.klsr.radio.R
@@ -14,15 +15,20 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 
-class SinglePostFragment : SafeFragment(R.layout.fragment_single_post) {
+class SinglePostFragment : Fragment(R.layout.fragment_single_post) {
     private var _binding: FragmentSinglePostBinding? = null
     private val binding get() = _binding!!
     private val postId: Int by lazy { arguments?.getInt("postId", 0) ?: 0 }
 
-    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
-        _binding = FragmentSinglePostBinding.bind(view)
-        binding.backBtn.setOnClickListener { parentFragmentManager.popBackStack() }
-        loadPost()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        try {
+            _binding = FragmentSinglePostBinding.bind(view)
+            binding.backBtn.setOnClickListener { parentFragmentManager.popBackStack() }
+            loadPost()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun loadPost() {
@@ -35,10 +41,13 @@ class SinglePostFragment : SafeFragment(R.layout.fragment_single_post) {
                     Gson().fromJson(json, BlogPostResponse::class.java)
                 } catch (e: Exception) { null }
             }
+            if (!isAdded) return@launch
             post?.let {
-                binding.postTitle.text = it.title.rendered
-                binding.postDate.text = it.date.take(10)
-                binding.postContent.text = Html.fromHtml(it.content.rendered, Html.FROM_HTML_MODE_COMPACT)
+                _binding?.let { b ->
+                    b.postTitle.text = it.title.rendered
+                    b.postDate.text = it.date.take(10)
+                    b.postContent.text = Html.fromHtml(it.content.rendered, Html.FROM_HTML_MODE_COMPACT)
+                }
             }
         }
     }

@@ -14,26 +14,25 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-class PrayerFragment : SafeFragment(R.layout.fragment_prayer) {
+class PrayerFragment : Fragment(R.layout.fragment_prayer) {
     private var _binding: FragmentPrayerBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentPrayerBinding.bind(view)
-        binding.submitPrayerBtn.setOnClickListener {
-            val name = binding.nameEditText.text.toString().trim()
-            val email = binding.emailEditText.text.toString().trim()
-            val phone = binding.phoneEditText.text.toString().trim()
-            val request = binding.requestEditText.text.toString().trim()
-            if (name.isEmpty() || request.isEmpty()) {
-                Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        try {
+            _binding = FragmentPrayerBinding.bind(view)
+            binding.submitPrayerBtn.setOnClickListener {
+                val name = binding.nameEditText.text.toString().trim()
+                val email = binding.emailEditText.text.toString().trim()
+                val phone = binding.phoneEditText.text.toString().trim()
+                val request = binding.requestEditText.text.toString().trim()
+                if (name.isEmpty() || request.isEmpty()) {
+                    Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                submit(name, email, phone, request)
             }
-            submit(name, email, phone, request)
-        }
+        } catch (e: Exception) { e.printStackTrace() }
     }
-
     private fun submit(name: String, email: String, phone: String, request: String) {
         lifecycleScope.launch {
             val ok = withContext(Dispatchers.IO) {
@@ -58,14 +57,16 @@ class PrayerFragment : SafeFragment(R.layout.fragment_prayer) {
                     conn.responseCode == 200
                 } catch (e: Exception) { false }
             }
+            if (!isAdded) return@launch
             Toast.makeText(requireContext(), if (ok) "Prayer request sent!" else "Prayer received in spirit", Toast.LENGTH_SHORT).show()
             if (ok) {
-                binding.nameEditText.text?.clear()
-                binding.requestEditText.text?.clear()
+                _binding?.let {
+                    it.nameEditText.text?.clear()
+                    it.requestEditText.text?.clear()
+                }
             }
         }
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

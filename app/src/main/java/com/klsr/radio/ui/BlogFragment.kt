@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,24 +21,29 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 
-class BlogFragment : SafeFragment(R.layout.fragment_blog) {
+class BlogFragment : Fragment(R.layout.fragment_blog) {
     private var _binding: FragmentBlogBinding? = null
     private val binding get() = _binding!!
     private var allPosts = emptyList<BlogPost>()
     private var currentPage = 1
     private var totalPages = 1
 
-    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
-        _binding = FragmentBlogBinding.bind(view)
-        binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        loadPosts(1)
-        binding.searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) { filter(s?.toString() ?: "") }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        binding.paginationControls.prevPageBtn.setOnClickListener { if (currentPage > 1) loadPosts(currentPage - 1) }
-        binding.paginationControls.nextPageBtn.setOnClickListener { if (currentPage < totalPages) loadPosts(currentPage + 1) }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        try {
+            _binding = FragmentBlogBinding.bind(view)
+            binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            loadPosts(1)
+            binding.searchEditText.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) { filter(s?.toString() ?: "") }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+            binding.paginationControls.prevPageBtn.setOnClickListener { if (currentPage > 1) loadPosts(currentPage - 1) }
+            binding.paginationControls.nextPageBtn.setOnClickListener { if (currentPage < totalPages) loadPosts(currentPage + 1) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun loadPosts(page: Int) {
@@ -58,20 +64,23 @@ class BlogFragment : SafeFragment(R.layout.fragment_blog) {
                     Pair(items, total)
                 } catch (e: Exception) { Pair(emptyList<BlogPost>(), 1) }
             }
+            if (!isAdded) return@launch
             allPosts = result.first
             totalPages = result.second
             currentPage = page
-            binding.blogRecyclerView.adapter = BlogPostAdapter(allPosts) { postId ->
-                findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
+            _binding?.let {
+                it.blogRecyclerView.adapter = BlogPostAdapter(allPosts) { postId ->
+                    findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
+                }
+                it.paginationControls.pageIndicator.text = "Page $page of $totalPages"
+                it.paginationControls.root.visibility = if (totalPages > 1) View.VISIBLE else View.GONE
             }
-            binding.paginationControls.pageIndicator.text = "Page $page of $totalPages"
-            binding.paginationControls.root.visibility = if (totalPages > 1) View.VISIBLE else View.GONE
         }
     }
 
     private fun filter(query: String) {
         val filtered = if (query.isBlank()) allPosts else allPosts.filter { it.title.contains(query, ignoreCase = true) || it.excerpt.contains(query, ignoreCase = true) }
-        binding.blogRecyclerView.adapter = BlogPostAdapter(filtered) { postId ->
+        _binding?.blogRecyclerView?.adapter = BlogPostAdapter(filtered) { postId ->
             findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
         }
     }
