@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.klsr.radio.R
 import com.klsr.radio.adapters.BlogPostAdapter
@@ -52,9 +53,17 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
                     val posts: List<BlogPostResponse> = Gson().fromJson(json, listType)
                     val total = conn.getHeaderField("X-WP-TotalPages")?.toIntOrNull() ?: 1
                     val items = posts.map { p ->
-                        val imgUrl = p._embedded?.get("wp:featuredmedia")?.getOrNull(0)?.source_url
-                        BlogPost(p.id, p.title.rendered, p.excerpt.rendered.replace(Regex("<[^>]+>"), "").take(150) + "...",
-                            p.date.take(10), imgUrl, p._embedded?.get("author")?.getOrNull(0)?.name ?: "Admin", p.content.rendered)
+                        val imgUrl = p.embedded?.wpFeaturedmedia?.getOrNull(0)?.sourceUrl
+                        val author = p.embedded?.author?.getOrNull(0)?.name ?: "Admin"
+                        BlogPost(
+                            p.id,
+                            p.title.rendered,
+                            p.excerpt.rendered.replace(Regex("<[^>]+>"), "").take(150) + "...",
+                            p.date.take(10),
+                            imgUrl,
+                            author,
+                            p.content.rendered
+                        )
                     }
                     Pair(items, total)
                 } catch (e: Exception) {
@@ -73,7 +82,8 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
     }
 
     private fun filter(query: String) {
-        val filtered = if (query.isBlank()) allPosts else allPosts.filter { it.title.contains(query, ignoreCase = true) || it.excerpt.contains(query, ignoreCase = true) }
+        val filtered = if (query.isBlank()) allPosts
+        else allPosts.filter { it.title.contains(query, ignoreCase = true) || it.excerpt.contains(query, ignoreCase = true) }
         binding.blogRecyclerView.adapter = BlogPostAdapter(filtered) { postId ->
             findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
         }
@@ -85,21 +95,23 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
     }
 }
 
-// JSON mapping classes
+// Gson mapping classes with @SerializedName to avoid backtick fields
 data class BlogPostResponse(
     val id: Int,
     val title: Title,
     val excerpt: Excerpt,
     val date: String,
     val content: Content,
-    val _embedded: Embedded?
+    @SerializedName("_embedded") val embedded: Embedded? = null
 )
 data class Title(val rendered: String)
 data class Excerpt(val rendered: String)
 data class Content(val rendered: String)
 data class Embedded(
-    val `wp:featuredmedia`: List<Media>?,
-    val author: List<Author>?
+    @SerializedName("wp:featuredmedia") val wpFeaturedmedia: List<Media>? = null,
+    val author: List<Author>? = null
 )
-data class Media(val source_url: String?)
+data class Media(val source_url: String?) {
+    val sourceUrl: String? get() = source_url
+}
 data class Author(val name: String?)

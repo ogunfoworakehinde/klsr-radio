@@ -16,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.common.util.concurrent.MoreExecutors
 import com.klsr.radio.databinding.ActivityMainBinding
+import com.klsr.radio.ui.ChannelSwitcherFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
