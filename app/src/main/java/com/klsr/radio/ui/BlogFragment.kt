@@ -8,11 +8,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.klsr.radio.R
 import com.klsr.radio.adapters.BlogPostAdapter
 import com.klsr.radio.data.BlogPost
+import com.klsr.radio.data.BlogPostResponse
 import com.klsr.radio.databinding.FragmentBlogBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
