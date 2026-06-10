@@ -17,9 +17,11 @@ class DonationFragment : Fragment(R.layout.fragment_donation) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDonationBinding.bind(view)
+
         try { binding.zenithLogo.setImageResource(R.drawable.zenith_bank_logo) } catch (_: Exception) {}
         try { binding.gtbankNgnLogo.setImageResource(R.drawable.gtbank_logo) } catch (_: Exception) {}
         try { binding.gtbankUsdLogo.setImageResource(R.drawable.gtbank_logo) } catch (_: Exception) {}
+
         binding.copyZenithBtn.setOnClickListener { copy("1229216755") }
         binding.copyGtbankNgnBtn.setOnClickListener { copy("0892125365") }
         binding.copyGtbankUsdBtn.setOnClickListener { copy("0892172060") }

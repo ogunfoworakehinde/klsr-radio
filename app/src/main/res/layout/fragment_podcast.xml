@@ -1,9 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?attr/colorPrimary">
-    <ImageView android:id="@+id/podcastHeroImage" android:layout_width="match_parent" android:layout_height="200dp" android:scaleType="centerCrop" android:background="#333" />
-    <include android:id="@+id/playerLayout" layout="@layout/podcast_player" />
-    <androidx.recyclerview.widget.RecyclerView android:id="@+id/podcastRecyclerView" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:padding="8dp" />
+    android:background="?attr/colorPrimary"
+    android:orientation="vertical">
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Hero image (scrolls with content, not fixed) -->
+            <ImageView
+                android:id="@+id/podcastHeroImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:background="@color/primary_light" />
+
+            <!-- Episode stats -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:padding="16dp"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/episodeCountText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Loading episodes..."
+                    android:textColor="?attr/colorOnPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Podcast list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/podcastRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:padding="8dp"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Player bar (collapsed until episode selected) -->
+    <include
+        android:id="@+id/playerLayout"
+        layout="@layout/podcast_player" />
 </LinearLayout>

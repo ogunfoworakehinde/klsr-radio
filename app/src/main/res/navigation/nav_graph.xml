@@ -29,19 +29,6 @@
         <argument android:name="postId" app:argType="integer" android:defaultValue="0" />
     </fragment>
 
-    <fragment android:id="@+id/moreFragment"
-        android:name="com.klsr.radio.ui.MoreFragment"
-        android:label="More">
-        <action android:id="@+id/action_more_to_about"
-            app:destination="@id/aboutFragment" />
-        <action android:id="@+id/action_more_to_donation"
-            app:destination="@id/donationFragment" />
-        <action android:id="@+id/action_more_to_contact"
-            app:destination="@id/contactFragment" />
-        <action android:id="@+id/action_more_to_settings"
-            app:destination="@id/settingsFragment" />
-    </fragment>
-
     <fragment android:id="@+id/aboutFragment"
         android:name="com.klsr.radio.ui.AboutFragment"
         android:label="About" />
@@ -57,5 +44,4 @@
     <fragment android:id="@+id/settingsFragment"
         android:name="com.klsr.radio.ui.SettingsFragment"
         android:label="Settings" />
-
 </navigation>

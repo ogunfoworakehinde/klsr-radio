@@ -21,15 +21,20 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     private var _binding: FragmentPodcastBinding? = null
     private val binding get() = _binding
     private var mediaPlayer: MediaPlayer? = null
+    private var episodes = emptyList<PodcastEpisode>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPodcastBinding.bind(view)
-        binding?.let { b ->
-            try { b.podcastHeroImage.setImageResource(R.drawable.hepp) } catch (_: Exception) {}
-            b.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        binding?.apply {
+            podcastHeroImage.setImageResource(R.drawable.hepp)
+            podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            podcastRecyclerView.isNestedScrollingEnabled = false // handled by NestedScrollView
+
             loadPodcasts()
-            b.playerLayout.btnPodcastPlayPause.setOnClickListener {
+
+            playerLayout.btnPodcastPlayPause.setOnClickListener {
                 mediaPlayer?.let { mp ->
                     if (mp.isPlaying) mp.pause() else mp.start()
                     updatePlayPauseIcon()
@@ -46,7 +51,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
 
     private fun loadPodcasts() {
         lifecycleScope.launch {
-            val episodes = withContext(Dispatchers.IO) {
+            val list = withContext(Dispatchers.IO) {
                 try {
                     val url = URL("https://anchor.fm/s/1d6ad87c/podcast/rss")
                     val conn = url.openConnection() as HttpURLConnection
@@ -59,12 +64,18 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                             val desc = Regex("<description><!\\[CDATA\\[(.*?)\\]\\]></description>").find(item)?.groupValues?.get(1) ?: ""
                             val audio = Regex("<enclosure url=\"(.*?)\"").find(item)?.groupValues?.get(1) ?: return@mapNotNull null
                             val image = Regex("<itunes:image href=\"(.*?)\"").find(item)?.groupValues?.get(1)
-                            PodcastEpisode(title = title, description = desc, audioUrl = audio, imageUrl = image)
+                            val pubDate = Regex("<pubDate>(.*?)</pubDate>").find(item)?.groupValues?.get(1)
+                            PodcastEpisode(title = title, description = desc, audioUrl = audio, imageUrl = image, pubDate = pubDate)
                         } catch (e: Exception) { null }
                     }
                 } catch (e: Exception) { emptyList() }
             }
-            binding?.podcastRecyclerView?.adapter = PodcastAdapter(episodes) { episode -> playEpisode(episode) }
+
+            episodes = list
+            binding?.apply {
+                episodeCountText.text = "${list.size} episodes available"
+                podcastRecyclerView.adapter = PodcastAdapter(list) { episode -> playEpisode(episode) }
+            }
         }
     }
 
@@ -77,10 +88,10 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                 setOnPreparedListener {
                     start()
                     updatePlayPauseIcon()
-                    binding?.let {
-                        it.playerLayout.currentPodcastTitle.text = episode.title
-                        it.playerLayout.currentPodcastDescription.text = episode.description
-                        it.playerLayout.root.visibility = View.VISIBLE
+                    binding?.playerLayout?.apply {
+                        currentPodcastTitle.text = episode.title
+                        currentPodcastDescription.text = episode.description
+                        root.visibility = View.VISIBLE
                     }
                 }
                 setOnErrorListener { _, _, _ -> false }

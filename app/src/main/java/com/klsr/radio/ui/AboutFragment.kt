@@ -13,6 +13,8 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAboutBinding.bind(view)
+
+        // Load team images safely; if drawable missing, placeholder remains
         try { binding.imageTeam1.setImageResource(R.drawable.team1) } catch (_: Exception) {}
         try { binding.imageTeam2.setImageResource(R.drawable.manager) } catch (_: Exception) {}
         try { binding.imageTeam3.setImageResource(R.drawable.voice) } catch (_: Exception) {}
