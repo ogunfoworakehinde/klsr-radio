@@ -10,11 +10,11 @@ import androidx.fragment.app.Fragment
 import com.klsr.radio.R
 import com.klsr.radio.databinding.FragmentDonationBinding
 
-class DonationFragment : Fragment(R.layout.fragment_donation) {
+class DonationFragment : SafeFragment(R.layout.fragment_donation) {
     private var _binding: FragmentDonationBinding? = null
     private val binding get() = _binding!!
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
             _binding = FragmentDonationBinding.bind(view)

@@ -14,11 +14,11 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-class PrayerFragment : Fragment(R.layout.fragment_prayer) {
+class PrayerFragment : SafeFragment(R.layout.fragment_prayer) {
     private var _binding: FragmentPrayerBinding? = null
     private val binding get() = _binding!!
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPrayerBinding.bind(view)
         binding.submitPrayerBtn.setOnClickListener {

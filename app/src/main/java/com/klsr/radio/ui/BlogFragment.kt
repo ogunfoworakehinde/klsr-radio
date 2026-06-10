@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,15 +20,14 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 
-class BlogFragment : Fragment(R.layout.fragment_blog) {
+class BlogFragment : SafeFragment(R.layout.fragment_blog) {
     private var _binding: FragmentBlogBinding? = null
     private val binding get() = _binding!!
     private var allPosts = emptyList<BlogPost>()
     private var currentPage = 1
     private var totalPages = 1
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentBlogBinding.bind(view)
         binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         loadPosts(1)
@@ -55,20 +53,10 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
                     val items = posts.map { p ->
                         val imgUrl = p.embedded?.wpFeaturedmedia?.getOrNull(0)?.sourceUrl
                         val author = p.embedded?.author?.getOrNull(0)?.name ?: "Admin"
-                        BlogPost(
-                            p.id,
-                            p.title.rendered,
-                            p.excerpt.rendered.replace(Regex("<[^>]+>"), "").take(150) + "...",
-                            p.date.take(10),
-                            imgUrl,
-                            author,
-                            p.content.rendered
-                        )
+                        BlogPost(p.id, p.title.rendered, p.excerpt.rendered.replace(Regex("<[^>]+>"), "").take(150) + "...", p.date.take(10), imgUrl, author, p.content.rendered)
                     }
                     Pair(items, total)
-                } catch (e: Exception) {
-                    Pair(emptyList<BlogPost>(), 1)
-                }
+                } catch (e: Exception) { Pair(emptyList<BlogPost>(), 1) }
             }
             allPosts = result.first
             totalPages = result.second
@@ -82,8 +70,7 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
     }
 
     private fun filter(query: String) {
-        val filtered = if (query.isBlank()) allPosts
-        else allPosts.filter { it.title.contains(query, ignoreCase = true) || it.excerpt.contains(query, ignoreCase = true) }
+        val filtered = if (query.isBlank()) allPosts else allPosts.filter { it.title.contains(query, ignoreCase = true) || it.excerpt.contains(query, ignoreCase = true) }
         binding.blogRecyclerView.adapter = BlogPostAdapter(filtered) { postId ->
             findNavController().navigate(R.id.singlePostFragment, Bundle().apply { putInt("postId", postId) })
         }
@@ -94,24 +81,3 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
         _binding = null
     }
 }
-
-// Gson mapping classes with @SerializedName to avoid backtick fields
-data class BlogPostResponse(
-    val id: Int,
-    val title: Title,
-    val excerpt: Excerpt,
-    val date: String,
-    val content: Content,
-    @SerializedName("_embedded") val embedded: Embedded? = null
-)
-data class Title(val rendered: String)
-data class Excerpt(val rendered: String)
-data class Content(val rendered: String)
-data class Embedded(
-    @SerializedName("wp:featuredmedia") val wpFeaturedmedia: List<Media>? = null,
-    val author: List<Author>? = null
-)
-data class Media(val source_url: String?) {
-    val sourceUrl: String? get() = source_url
-}
-data class Author(val name: String?)

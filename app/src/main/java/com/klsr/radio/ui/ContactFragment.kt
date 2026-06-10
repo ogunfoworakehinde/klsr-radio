@@ -16,11 +16,11 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-class ContactFragment : Fragment(R.layout.fragment_contact) {
+class ContactFragment : SafeFragment(R.layout.fragment_contact) {
     private var _binding: FragmentContactBinding? = null
     private val binding get() = _binding!!
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
             _binding = FragmentContactBinding.bind(view)

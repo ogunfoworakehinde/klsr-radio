@@ -9,14 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.klsr.radio.R
 import com.klsr.radio.RadioService
 import com.klsr.radio.adapters.HeroSliderAdapter
 import com.klsr.radio.databinding.FragmentHomeBinding
 
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : SafeFragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val handler = Handler(Looper.getMainLooper())
@@ -24,13 +23,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var currentSlide = 0
     private val images = listOf(R.drawable.herr1, R.drawable.herr2, R.drawable.herr3, R.drawable.herr4)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
+        _binding = FragmentHomeBinding.bind(view)
         val adapter = HeroSliderAdapter(images)
         binding.heroViewPager.adapter = adapter
         val dotsLayout: LinearLayout = binding.dotsLayout

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -61,10 +62,15 @@ class MainActivity : AppCompatActivity() {
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
         binding.playerBar.btnChannelSwitcher.setOnClickListener {
-            val bottomSheet = ChannelSwitcherFragment { index ->
-                switchStation(index - currentStation)
-            }
+            val bottomSheet = ChannelSwitcherFragment()
             bottomSheet.show(supportFragmentManager, "ChannelSwitcher")
+            // Listen for result
+            supportFragmentManager.setFragmentResultListener(ChannelSwitcherFragment.REQUEST_KEY, this) { _, bundle ->
+                val index = bundle.getInt(ChannelSwitcherFragment.RESULT_INDEX, -1)
+                if (index != -1 && index != currentStation) {
+                    switchStation(index - currentStation)
+                }
+            }
         }
     }
 

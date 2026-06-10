@@ -7,11 +7,11 @@ import androidx.navigation.fragment.findNavController
 import com.klsr.radio.R
 import com.klsr.radio.databinding.FragmentMoreBinding
 
-class MoreFragment : Fragment(R.layout.fragment_more) {
+class MoreFragment : SafeFragment(R.layout.fragment_more) {
     private var _binding: FragmentMoreBinding? = null
     private val binding get() = _binding!!
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
             _binding = FragmentMoreBinding.bind(view)

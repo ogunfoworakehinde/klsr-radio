@@ -14,12 +14,12 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 
-class SinglePostFragment : Fragment(R.layout.fragment_single_post) {
+class SinglePostFragment : SafeFragment(R.layout.fragment_single_post) {
     private var _binding: FragmentSinglePostBinding? = null
     private val binding get() = _binding!!
     private val postId: Int by lazy { arguments?.getInt("postId", 0) ?: 0 }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentSinglePostBinding.bind(view)
         binding.backBtn.setOnClickListener { parentFragmentManager.popBackStack() }

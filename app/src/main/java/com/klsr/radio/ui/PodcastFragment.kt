@@ -4,7 +4,6 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.klsr.radio.R
@@ -17,24 +16,17 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 
-class PodcastFragment : Fragment(R.layout.fragment_podcast) {
+class PodcastFragment : SafeFragment(R.layout.fragment_podcast) {
     private var _binding: FragmentPodcastBinding? = null
     private val binding get() = _binding!!
     private var mediaPlayer: MediaPlayer? = null
     private var currentEpisode: PodcastEpisode? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onSafeViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentPodcastBinding.bind(view)
-
-        // Hero image (hepp.png)
         binding.podcastHeroImage.setImageResource(R.drawable.hepp)
-
-        // Podcast list
         binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         loadPodcasts()
-
-        // Play/pause button
         binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
             currentEpisode?.let { ep ->
                 mediaPlayer?.let { mp ->
@@ -73,9 +65,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                             PodcastEpisode(title = title, description = desc, audioUrl = audio, imageUrl = image)
                         } catch (e: Exception) { null }
                     }
-                } catch (e: Exception) {
-                    emptyList()
-                }
+                } catch (e: Exception) { emptyList() }
             }
             binding.podcastRecyclerView.adapter = PodcastAdapter(episodes) { episode -> playEpisode(episode) }
         }
