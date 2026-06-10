@@ -12,8 +12,11 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentAboutBinding.bind(view)
-        // team images are set directly in layout via srcCompat
+        try {
+            _binding = FragmentAboutBinding.bind(view)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onDestroyView() {

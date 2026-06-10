@@ -13,11 +13,13 @@ class MoreFragment : Fragment(R.layout.fragment_more) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentMoreBinding.bind(view)
-        binding.aboutBtn.setOnClickListener { findNavController().navigate(R.id.aboutFragment) }
-        binding.donateBtn.setOnClickListener { findNavController().navigate(R.id.donationFragment) }
-        binding.contactBtn.setOnClickListener { findNavController().navigate(R.id.contactFragment) }
-        binding.settingsBtn.setOnClickListener { findNavController().navigate(R.id.settingsFragment) }
+        try {
+            _binding = FragmentMoreBinding.bind(view)
+            binding.aboutBtn.setOnClickListener { findNavController().navigate(R.id.aboutFragment) }
+            binding.donateBtn.setOnClickListener { findNavController().navigate(R.id.donationFragment) }
+            binding.contactBtn.setOnClickListener { findNavController().navigate(R.id.contactFragment) }
+            binding.settingsBtn.setOnClickListener { findNavController().navigate(R.id.settingsFragment) }
+        } catch (e: Exception) { e.printStackTrace() }
     }
 
     override fun onDestroyView() {

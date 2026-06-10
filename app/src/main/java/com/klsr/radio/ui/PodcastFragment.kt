@@ -14,7 +14,6 @@ import com.klsr.radio.databinding.FragmentPodcastBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -22,24 +21,38 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     private var _binding: FragmentPodcastBinding? = null
     private val binding get() = _binding!!
     private var mediaPlayer: MediaPlayer? = null
+    private var currentEpisode: PodcastEpisode? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPodcastBinding.bind(view)
+
+        // Hero image (hepp.png)
+        binding.podcastHeroImage.setImageResource(R.drawable.hepp)
+
+        // Podcast list
         binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         loadPodcasts()
+
+        // Play/pause button
         binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
-            mediaPlayer?.let {
-                if (it.isPlaying) it.pause() else it.start()
-                updatePlayPause()
+            currentEpisode?.let { ep ->
+                mediaPlayer?.let { mp ->
+                    if (mp.isPlaying) {
+                        mp.pause()
+                        updatePlayPauseIcon(false)
+                    } else {
+                        mp.start()
+                        updatePlayPauseIcon(true)
+                    }
+                } ?: playEpisode(ep)
             }
         }
     }
 
-    private fun updatePlayPause() {
-        binding.playerLayout.btnPodcastPlayPause.setImageResource(
-            if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
-        )
+    private fun updatePlayPauseIcon(isPlaying: Boolean) {
+        val icon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
+        binding.playerLayout.btnPodcastPlayPause.setImageResource(icon)
     }
 
     private fun loadPodcasts() {
@@ -50,7 +63,6 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     val conn = url.openConnection() as HttpURLConnection
                     conn.connectTimeout = 10000
                     val text = conn.inputStream.bufferedReader().readText()
-                    // simple XML parsing using regex (won't work for complex feeds, but fine for this)
                     val items = text.split("<item>").drop(1)
                     items.mapNotNull { item ->
                         try {
@@ -62,30 +74,35 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                         } catch (e: Exception) { null }
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(requireContext(), "Failed to load podcasts", Toast.LENGTH_SHORT).show()
                     emptyList()
                 }
             }
-            binding.podcastRecyclerView.adapter = PodcastAdapter(episodes) { playEpisode(it) }
+            binding.podcastRecyclerView.adapter = PodcastAdapter(episodes) { episode -> playEpisode(episode) }
         }
     }
 
-    private fun playEpisode(ep: PodcastEpisode) {
+    private fun playEpisode(episode: PodcastEpisode) {
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer().apply {
             try {
-                setDataSource(ep.audioUrl)
+                setDataSource(episode.audioUrl)
                 prepareAsync()
                 setOnPreparedListener {
                     start()
-                    updatePlayPause()
-                    binding.playerLayout.currentPodcastTitle.text = ep.title
+                    updatePlayPauseIcon(true)
+                    binding.playerLayout.currentPodcastTitle.text = episode.title
+                    binding.playerLayout.currentPodcastDescription.text = episode.description
                     binding.playerLayout.root.visibility = View.VISIBLE
                 }
+                setOnErrorListener { _, _, _ ->
+                    Toast.makeText(requireContext(), "Playback failed", Toast.LENGTH_SHORT).show()
+                    false
+                }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Playback failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Unable to play episode", Toast.LENGTH_SHORT).show()
             }
         }
+        currentEpisode = episode
     }
 
     override fun onDestroyView() {

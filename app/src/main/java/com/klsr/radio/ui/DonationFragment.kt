@@ -16,10 +16,12 @@ class DonationFragment : Fragment(R.layout.fragment_donation) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentDonationBinding.bind(view)
-        binding.copyZenithBtn.setOnClickListener { copy("1229216755") }
-        binding.copyGtbankNgnBtn.setOnClickListener { copy("0892125365") }
-        binding.copyGtbankUsdBtn.setOnClickListener { copy("0892172060") }
+        try {
+            _binding = FragmentDonationBinding.bind(view)
+            binding.copyZenithBtn.setOnClickListener { copy("1229216755") }
+            binding.copyGtbankNgnBtn.setOnClickListener { copy("0892125365") }
+            binding.copyGtbankUsdBtn.setOnClickListener { copy("0892172060") }
+        } catch (e: Exception) { e.printStackTrace() }
     }
 
     private fun copy(text: String) {

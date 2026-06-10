@@ -22,40 +22,27 @@ class ContactFragment : Fragment(R.layout.fragment_contact) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentContactBinding.bind(view)
-        binding.sendContactBtn.setOnClickListener {
-            val name = binding.contactNameEditText.text.toString().trim()
-            val email = binding.contactEmailEditText.text.toString().trim()
-            val subject = binding.contactSubjectEditText.text.toString().trim()
-            val msg = binding.contactMessageEditText.text.toString().trim()
-            if (name.isEmpty() || email.isEmpty() || msg.isEmpty()) {
-                Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        try {
+            _binding = FragmentContactBinding.bind(view)
+            binding.sendContactBtn.setOnClickListener {
+                val name = binding.contactNameEditText.text.toString().trim()
+                val email = binding.contactEmailEditText.text.toString().trim()
+                val subject = binding.contactSubjectEditText.text.toString().trim()
+                val msg = binding.contactMessageEditText.text.toString().trim()
+                if (name.isEmpty() || email.isEmpty() || msg.isEmpty()) {
+                    Toast.makeText(requireContext(), "Fill required fields", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                sendEmailJS(name, email, subject, msg)
             }
-            sendEmailJS(name, email, subject, msg)
-        }
-        // Social media buttons
-        binding.btnWhatsapp.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/2349160006614")))
-        }
-        binding.btnFacebook.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/kingdomLifestyleradio/")))
-        }
-        binding.btnTwitter.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/kingdomlifestr")))
-        }
-        binding.btnInstagram.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/kingdom.lifestyleradio")))
-        }
-        binding.btnYoutube.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://m.youtube.com/channel/UC64-kfcZkFuIi83pPqFpECQ")))
-        }
-        binding.btnTelegram.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/kingdomlifestyleradio")))
-        }
-        binding.btnWebsite.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://kingdomlifestyleradio.com")))
-        }
+            binding.btnWhatsapp.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/2349160006614"))) }
+            binding.btnFacebook.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/kingdomLifestyleradio/"))) }
+            binding.btnTwitter.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/kingdomlifestr"))) }
+            binding.btnInstagram.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/kingdom.lifestyleradio"))) }
+            binding.btnYoutube.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://m.youtube.com/channel/UC64-kfcZkFuIi83pPqFpECQ"))) }
+            binding.btnTelegram.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/kingdomlifestyleradio"))) }
+            binding.btnWebsite.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://kingdomlifestyleradio.com"))) }
+        } catch (e: Exception) { e.printStackTrace() }
     }
 
     private fun sendEmailJS(name: String, email: String, subject: String, message: String) {
