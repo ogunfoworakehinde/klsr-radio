@@ -9,6 +9,8 @@ import com.klsr.radio.databinding.FragmentMoreBinding
 
 class MoreFragment : Fragment(R.layout.fragment_more) {
     private var _binding: FragmentMoreBinding? = null
+    private val binding get() = _binding!!
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
@@ -19,6 +21,7 @@ class MoreFragment : Fragment(R.layout.fragment_more) {
             binding.settingsBtn.setOnClickListener { findNavController().navigate(R.id.settingsFragment) }
         } catch (e: Exception) { e.printStackTrace() }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

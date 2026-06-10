@@ -11,7 +11,9 @@ import com.klsr.radio.databinding.FragmentSettingsBinding
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var prefs: SharedPreferences
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
@@ -31,6 +33,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         } catch (e: Exception) { e.printStackTrace() }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

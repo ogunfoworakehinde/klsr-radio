@@ -18,6 +18,8 @@ import java.net.URL
 
 class ContactFragment : Fragment(R.layout.fragment_contact) {
     private var _binding: FragmentContactBinding? = null
+    private val binding get() = _binding!!
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
@@ -42,6 +44,7 @@ class ContactFragment : Fragment(R.layout.fragment_contact) {
             binding.btnWebsite.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://kingdomlifestyleradio.com"))) }
         } catch (e: Exception) { e.printStackTrace() }
     }
+
     private fun sendEmailJS(name: String, email: String, subject: String, message: String) {
         lifecycleScope.launch {
             val ok = withContext(Dispatchers.IO) {
@@ -69,15 +72,14 @@ class ContactFragment : Fragment(R.layout.fragment_contact) {
             if (!isAdded) return@launch
             Toast.makeText(requireContext(), if (ok) "Message sent!" else "We'll get back to you.", Toast.LENGTH_SHORT).show()
             if (ok) {
-                _binding?.let {
-                    it.contactNameEditText.text?.clear()
-                    it.contactEmailEditText.text?.clear()
-                    it.contactSubjectEditText.text?.clear()
-                    it.contactMessageEditText.text?.clear()
-                }
+                binding.contactNameEditText.text?.clear()
+                binding.contactEmailEditText.text?.clear()
+                binding.contactSubjectEditText.text?.clear()
+                binding.contactMessageEditText.text?.clear()
             }
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

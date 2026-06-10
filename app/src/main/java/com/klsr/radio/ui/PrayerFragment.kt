@@ -16,6 +16,8 @@ import java.net.URL
 
 class PrayerFragment : Fragment(R.layout.fragment_prayer) {
     private var _binding: FragmentPrayerBinding? = null
+    private val binding get() = _binding!!
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
@@ -33,6 +35,7 @@ class PrayerFragment : Fragment(R.layout.fragment_prayer) {
             }
         } catch (e: Exception) { e.printStackTrace() }
     }
+
     private fun submit(name: String, email: String, phone: String, request: String) {
         lifecycleScope.launch {
             val ok = withContext(Dispatchers.IO) {
@@ -60,13 +63,12 @@ class PrayerFragment : Fragment(R.layout.fragment_prayer) {
             if (!isAdded) return@launch
             Toast.makeText(requireContext(), if (ok) "Prayer request sent!" else "Prayer received in spirit", Toast.LENGTH_SHORT).show()
             if (ok) {
-                _binding?.let {
-                    it.nameEditText.text?.clear()
-                    it.requestEditText.text?.clear()
-                }
+                binding.nameEditText.text?.clear()
+                binding.requestEditText.text?.clear()
             }
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
