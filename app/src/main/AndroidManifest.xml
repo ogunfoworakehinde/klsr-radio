@@ -7,7 +7,7 @@
     <application
         android:name=".RadioApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_logo"
+        android:icon="@mipmap/ic_launcher"
         android:label="KLSR Radio"
         android:theme="@style/Theme.KLSRRadio"
         android:supportsRtl="true">
