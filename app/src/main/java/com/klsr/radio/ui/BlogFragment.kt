@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -25,7 +24,6 @@ import com.klsr.radio.databinding.FragmentBlogBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.HttpURLConnection
@@ -44,8 +42,13 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Wrap the entire setup in a global try/catch so we never crash
         try {
             _binding = FragmentBlogBinding.bind(view)
+
+            // Hide error text initially
+            binding.blogErrorText.visibility = View.GONE
+
             binding.blogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             binding.blogRecyclerView.isNestedScrollingEnabled = false
 
@@ -65,10 +68,26 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
                 if (currentPage < totalPages) loadPosts(currentPage + 1)
             }
         } catch (e: Exception) {
-            logCrash(e)
+            showError(e)
         }
     }
 
+    // ---------- Error display ----------
+    private fun showError(e: Exception) {
+        val sw = StringWriter()
+        e.printStackTrace(PrintWriter(sw))
+        val stacktrace = sw.toString()
+        // Show in the dedicated error TextView
+        binding.blogErrorText.text = "BLOG CRASH:\n$stacktrace"
+        binding.blogErrorText.visibility = View.VISIBLE
+        // Also save to file for later inspection
+        try {
+            val file = java.io.File(requireContext().filesDir, "last_crash.txt")
+            file.writeText(stacktrace)
+        } catch (_: Exception) {}
+    }
+
+    // ---------- Hero slider ----------
     private fun loadHeroPosts() {
         lifecycleScope.launch {
             try {
@@ -93,7 +112,7 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
                 heroPosts = posts
                 setupHeroSlider()
             } catch (e: Exception) {
-                logCrash(e)
+                showError(e)
             }
         }
     }
@@ -136,7 +155,7 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
             })
             startHeroAutoSlide()
         } catch (e: Exception) {
-            logCrash(e)
+            showError(e)
         }
     }
 
@@ -187,7 +206,7 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
                 binding.paginationControls.pageIndicator.text = "Page $page of $totalPages"
                 binding.paginationControls.root.visibility = if (totalPages > 1) View.VISIBLE else View.GONE
             } catch (e: Exception) {
-                logCrash(e)
+                showError(e)
             }
         }
     }
@@ -200,15 +219,6 @@ class BlogFragment : Fragment(R.layout.fragment_blog) {
             if (isAdded) findNavController().navigate(R.id.action_blog_to_singlePost,
                 Bundle().apply { putInt("postId", postId) })
         }
-    }
-
-    private fun logCrash(e: Exception) {
-        try {
-            val file = File(requireContext().filesDir, "last_crash.txt")
-            val sw = StringWriter()
-            e.printStackTrace(PrintWriter(sw))
-            file.writeText(sw.toString())
-        } catch (_: Exception) {}
     }
 
     override fun onDestroyView() {
