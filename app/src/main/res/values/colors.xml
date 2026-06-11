@@ -5,4 +5,5 @@
     <color name="gold">#d4af37</color>
     <color name="dark_bg">#121212</color>
     <color name="light_bg">#f5f7ff</color>
+    <color name="splash_bg">#05081a</color>
 </resources>
