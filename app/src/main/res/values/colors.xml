@@ -1,9 +1,8 @@
 <resources>
-    <color name="primary">#0a0f2d</color>
-    <color name="primary_dark">#05081a</color>
-    <color name="primary_light">#1a235c</color>
-    <color name="accent">#FF5252</color>
-    <color name="splash_bg">#05081a</color>
     <color name="white">#FFFFFF</color>
-    <color name="text_light">#B3FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="deep_blue">#0a0f2d</color>
+    <color name="gold">#d4af37</color>
+    <color name="dark_bg">#121212</color>
+    <color name="light_bg">#f5f7ff</color>
 </resources>

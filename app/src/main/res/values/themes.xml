@@ -1,42 +1,27 @@
 <resources>
-    <!-- Deep Blue (default) -->
+    <!-- Deep Blue (Light) Theme -->
     <style name="Theme.KLSRRadio" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary = Deep blue for buttons, app bar -->
         <item name="colorPrimary">#0a0f2d</item>
         <item name="colorPrimaryDark">#05081a</item>
-        <item name="colorAccent">#FF5252</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorOnSurface">#FFFFFF</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
-        <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
-        <item name="bottomNavigationStyle">@style/BottomNavStyle</item>
-    </style>
+        <!-- Accent (unused but kept) -->
+        <item name="colorAccent">#0a0f2d</item>
 
-    <!-- Light Theme -->
-    <style name="Theme.KLSRRadio.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">#0a0f2d</item>
-        <item name="colorPrimaryDark">#05081a</item>
-        <item name="colorAccent">#FF5252</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorOnSurface">#000000</item>
+        <!-- Surfaces (cards, pages) -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Background of the whole app -->
+        <item name="android:colorBackground">#f5f7ff</item>
+
+        <!-- Status bar & navigation -->
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
-        <item name="bottomNavigationStyle">@style/BottomNavStyle.Light</item>
     </style>
 
     <style name="Theme.Splash" parent="Theme.KLSRRadio">
-        <item name="android:windowBackground">@color/splash_bg</item>
-    </style>
-
-    <!-- Bottom Navigation Style (Deep Blue/Dark) -->
-    <style name="BottomNavStyle" parent="Widget.MaterialComponents.BottomNavigationView">
-        <item name="itemIconTint">@android:color/white</item>
-        <item name="itemTextColor">@android:color/white</item>
-        <item name="itemBackground">?attr/selectableItemBackground</item>
-    </style>
-
-    <style name="BottomNavStyle.Light" parent="Widget.MaterialComponents.BottomNavigationView">
-        <item name="itemIconTint">@color/primary</item>
-        <item name="itemTextColor">@color/primary</item>
-        <item name="itemBackground">?attr/selectableItemBackground</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 </resources>
