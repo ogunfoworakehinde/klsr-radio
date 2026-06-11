@@ -1,79 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimary"
-    android:orientation="vertical">
+    android:background="?attr/colorPrimary">
 
-    <!-- Error display (hidden until crash) -->
     <TextView
-        android:id="@+id/blogErrorText"
-        android:layout_width="match_parent"
+        android:id="@+id/blogStatus"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#990000"
-        android:textColor="#FFFFFF"
-        android:padding="12dp"
-        android:textSize="12sp"
-        android:visibility="gone"
-        android:textIsSelectable="true" />
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/blogHeroViewPager"
-                android:layout_width="match_parent"
-                android:layout_height="250dp" />
-
-            <LinearLayout
-                android:id="@+id/blogHeroDots"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="8dp" />
-
-            <EditText
-                android:id="@+id/searchEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:drawableStart="@drawable/ic_search"
-                android:hint="Search articles..."
-                android:inputType="text"
-                android:background="@android:drawable/edit_text" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="All Articles"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/blogRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:clipToPadding="false"
-                android:padding="8dp" />
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
-    <include
-        android:id="@+id/paginationControls"
-        layout="@layout/pagination_controls" />
-</LinearLayout>
+        android:layout_gravity="center"
+        android:text="Blog page loaded successfully"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="18sp" />
+</FrameLayout>
