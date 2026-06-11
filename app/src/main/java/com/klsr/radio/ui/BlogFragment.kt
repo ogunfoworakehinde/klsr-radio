@@ -8,6 +8,7 @@ import com.klsr.radio.databinding.FragmentBlogBinding
 
 class BlogFragment : Fragment(R.layout.fragment_blog) {
     private var _binding: FragmentBlogBinding? = null
+    private val binding get() = _binding!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
