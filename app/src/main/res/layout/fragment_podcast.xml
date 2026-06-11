@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimary"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/colorPrimary">
 
-    <!-- Scrollable content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -16,7 +14,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Hero image (scrolls with content, not fixed) -->
             <ImageView
                 android:id="@+id/podcastHeroImage"
                 android:layout_width="match_parent"
@@ -24,7 +21,6 @@
                 android:scaleType="centerCrop"
                 android:background="@color/primary_light" />
 
-            <!-- Episode stats -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -41,7 +37,6 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Podcast list -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/podcastRecyclerView"
                 android:layout_width="match_parent"
@@ -52,7 +47,6 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Player bar (collapsed until episode selected) -->
     <include
         android:id="@+id/playerLayout"
         layout="@layout/podcast_player" />

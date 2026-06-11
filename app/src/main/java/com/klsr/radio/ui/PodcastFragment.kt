@@ -14,39 +14,42 @@ import com.klsr.radio.databinding.FragmentPodcastBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
 import java.net.HttpURLConnection
 import java.net.URL
 
 class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     private var _binding: FragmentPodcastBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
     private var mediaPlayer: MediaPlayer? = null
     private var episodes = emptyList<PodcastEpisode>()
+    private var currentEpisode: PodcastEpisode? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPodcastBinding.bind(view)
 
-        binding?.apply {
-            podcastHeroImage.setImageResource(R.drawable.hepp)
-            podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            podcastRecyclerView.isNestedScrollingEnabled = false // handled by NestedScrollView
+        binding.podcastHeroImage.setImageResource(R.drawable.hepp)
+        binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-            loadPodcasts()
+        loadPodcasts()
 
-            playerLayout.btnPodcastPlayPause.setOnClickListener {
-                mediaPlayer?.let { mp ->
-                    if (mp.isPlaying) mp.pause() else mp.start()
-                    updatePlayPauseIcon()
+        binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
+            currentEpisode?.let { ep ->
+                if (mediaPlayer?.isPlaying == true) {
+                    mediaPlayer?.pause()
+                } else {
+                    mediaPlayer?.start()
                 }
+                updatePlayPauseIcon()
             }
         }
     }
 
     private fun updatePlayPauseIcon() {
-        binding?.playerLayout?.btnPodcastPlayPause?.setImageResource(
-            if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
-        )
+        val icon = if (mediaPlayer?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
+        binding.playerLayout.btnPodcastPlayPause.setImageResource(icon)
     }
 
     private fun loadPodcasts() {
@@ -56,30 +59,58 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     val url = URL("https://anchor.fm/s/1d6ad87c/podcast/rss")
                     val conn = url.openConnection() as HttpURLConnection
                     conn.connectTimeout = 10000
-                    val text = conn.inputStream.bufferedReader().readText()
-                    val items = text.split("<item>").drop(1)
-                    items.mapNotNull { item ->
-                        try {
-                            val title = Regex("<title><!\\[CDATA\\[(.*?)\\]\\]></title>").find(item)?.groupValues?.get(1) ?: ""
-                            val desc = Regex("<description><!\\[CDATA\\[(.*?)\\]\\]></description>").find(item)?.groupValues?.get(1) ?: ""
-                            val audio = Regex("<enclosure url=\"(.*?)\"").find(item)?.groupValues?.get(1) ?: return@mapNotNull null
-                            val image = Regex("<itunes:image href=\"(.*?)\"").find(item)?.groupValues?.get(1)
-                            val pubDate = Regex("<pubDate>(.*?)</pubDate>").find(item)?.groupValues?.get(1)
-                            PodcastEpisode(title = title, description = desc, audioUrl = audio, imageUrl = image, pubDate = pubDate)
-                        } catch (e: Exception) { null }
+                    val input = conn.inputStream
+                    val factory = XmlPullParserFactory.newInstance()
+                    factory.isNamespaceAware = true
+                    val parser = factory.newPullParser()
+                    parser.setInput(input, null)
+                    var eventType = parser.eventType
+                    val episodes = mutableListOf<PodcastEpisode>()
+                    var current: PodcastEpisode? = null
+                    var tag = ""
+                    while (eventType != XmlPullParser.END_DOCUMENT) {
+                        when (eventType) {
+                            XmlPullParser.START_TAG -> {
+                                tag = parser.name
+                                if (tag == "item") {
+                                    current = PodcastEpisode()
+                                }
+                            }
+                            XmlPullParser.TEXT -> {
+                                val text = parser.text ?: ""
+                                when (tag) {
+                                    "title" -> current?.title = text
+                                    "description" -> current?.description = text
+                                    "itunes:image" -> current?.imageUrl = parser.getAttributeValue(null, "href")
+                                    "enclosure" -> current?.audioUrl = parser.getAttributeValue(null, "url")
+                                    "pubDate" -> current?.pubDate = text
+                                    "itunes:duration" -> current?.duration = text
+                                    "itunes:author" -> current?.author = text
+                                }
+                            }
+                            XmlPullParser.END_TAG -> {
+                                if (parser.name == "item") {
+                                    current?.let { episodes.add(it) }
+                                    current = null
+                                }
+                                tag = ""
+                            }
+                        }
+                        eventType = parser.next()
                     }
-                } catch (e: Exception) { emptyList() }
+                    episodes
+                } catch (e: Exception) {
+                    emptyList()
+                }
             }
-
             episodes = list
-            binding?.apply {
-                episodeCountText.text = "${list.size} episodes available"
-                podcastRecyclerView.adapter = PodcastAdapter(list) { episode -> playEpisode(episode) }
-            }
+            binding.episodeCountText.text = "${list.size} episodes available"
+            binding.podcastRecyclerView.adapter = PodcastAdapter(list) { episode -> playEpisode(episode) }
         }
     }
 
     private fun playEpisode(episode: PodcastEpisode) {
+        currentEpisode = episode
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer().apply {
             try {
@@ -88,15 +119,16 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                 setOnPreparedListener {
                     start()
                     updatePlayPauseIcon()
-                    binding?.playerLayout?.apply {
-                        currentPodcastTitle.text = episode.title
-                        currentPodcastDescription.text = episode.description
-                        root.visibility = View.VISIBLE
-                    }
+                    binding.playerLayout.currentPodcastTitle.text = episode.title
+                    binding.playerLayout.currentPodcastDescription.text = episode.description
+                    binding.playerLayout.root.visibility = View.VISIBLE
                 }
-                setOnErrorListener { _, _, _ -> false }
+                setOnErrorListener { _, _, _ ->
+                    Toast.makeText(requireContext(), "Playback failed", Toast.LENGTH_SHORT).show()
+                    false
+                }
             } catch (e: Exception) {
-                Toast.makeText(context, "Unable to play", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Unable to play episode", Toast.LENGTH_SHORT).show()
             }
         }
     }

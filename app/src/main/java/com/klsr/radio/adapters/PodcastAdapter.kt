@@ -30,7 +30,7 @@ class PodcastAdapter(
             b.podcastTitle.text = episode.title
             b.podcastDescription.text = episode.description ?: ""
 
-            // Date
+            // Date format
             try {
                 val inputFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
                 val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
@@ -44,6 +44,10 @@ class PodcastAdapter(
 
             // Duration
             b.podcastDuration.text = episode.duration ?: ""
+
+            // Author (if available, otherwise empty)
+            // We don't have a dedicated author field in layout, but we can set it to the meta row?
+            // Actually, the current item layout doesn't have an author TextView, so we skip.
 
             // Image
             episode.imageUrl?.let {
