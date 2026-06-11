@@ -3,6 +3,7 @@ package com.klsr.radio
 import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -26,8 +27,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private var mediaController: MediaController? = null
     private var currentStation = 0
-    // Track current play state locally for immediate icon updates
     private var isPlaying = false
+    private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +37,8 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        prefs = getSharedPreferences("settings", MODE_PRIVATE)
 
         // Notification permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -49,10 +52,9 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         setupCustomBottomNav()
 
-        // Settings button in toolbar
         binding.btnSettings.setOnClickListener { navController.navigate(R.id.settingsFragment) }
 
-        // Connect to the MediaController (may already be running from HomeFragment)
+        // Connect to MediaController
         try {
             val token = SessionToken(this, ComponentName(this, RadioService::class.java))
             val future = MediaController.Builder(this, token).buildAsync()
@@ -67,8 +69,23 @@ class MainActivity : AppCompatActivity() {
             }, MoreExecutors.directExecutor())
         } catch (e: Exception) { Log.e("MainActivity", "SessionToken failed", e) }
 
-        // ---------- Player bar buttons ----------
-        // Play/Pause: send ACTION_PLAY_PAUSE intent (exactly like the lock screen)
+        // ----- Auto‑play feature -----
+        val autoPlay = prefs.getBoolean("auto_play", true)
+        if (autoPlay) {
+            // Start the radio service if not already running
+            val intent = Intent(this, RadioService::class.java).apply {
+                putExtra(RadioService.EXTRA_STATION_INDEX, currentStation)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                startForegroundService(intent)
+            else
+                startService(intent)
+            // Assume it will start playing; the listener will update the icon later
+            isPlaying = true
+            updatePlayPauseIcon()
+        }
+
+        // Player bar buttons
         binding.playerBar.btnPlayPause.setOnClickListener {
             val intent = Intent(this, RadioService::class.java).apply {
                 action = RadioService.ACTION_PLAY_PAUSE
@@ -77,15 +94,11 @@ class MainActivity : AppCompatActivity() {
                 startForegroundService(intent)
             else
                 startService(intent)
-
-            // Immediately toggle the local state and icon, then rely on the listener to correct if needed
             isPlaying = !isPlaying
             updatePlayPauseIcon()
         }
-
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
-
         binding.playerBar.btnChannelSwitcher.setOnClickListener {
             val bottomSheet = ChannelSwitcherFragment()
             bottomSheet.show(supportFragmentManager, "ChannelSwitcher")
@@ -99,15 +112,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------- Custom bottom navigation ----------
-    private fun setupCustomBottomNav() {
+    private fun setupCustomBottomNav() { /* unchanged */ 
         val buttonMap = mapOf(
             R.id.nav_home to R.id.homeFragment,
             R.id.nav_podcast to R.id.podcastFragment,
             R.id.nav_prayer to R.id.prayerFragment,
             R.id.nav_blog to R.id.blogFragment
         )
-
         buttonMap.forEach { (btnId, destId) ->
             findViewById<Button>(btnId).setOnClickListener {
                 navController.navigate(destId, null,
@@ -116,7 +127,6 @@ class MainActivity : AppCompatActivity() {
                         .setLaunchSingleTop(true).build())
             }
         }
-
         findViewById<Button>(R.id.nav_more).setOnClickListener { view ->
             val popup = PopupMenu(this, view)
             popup.menuInflater.inflate(R.menu.more_popup_menu, popup.menu)
@@ -131,31 +141,21 @@ class MainActivity : AppCompatActivity() {
             }
             popup.show()
         }
-
-        // Highlight active button
         navController.addOnDestinationChangedListener { _, destination, _ ->
             buttonMap.entries.forEach { (btnId, destId) ->
                 findViewById<Button>(btnId).isSelected = (destination.id == destId)
             }
-            val moreDestinations = listOf(
-                R.id.aboutFragment, R.id.donationFragment,
-                R.id.contactFragment, R.id.settingsFragment
-            )
-            findViewById<Button>(R.id.nav_more).isSelected =
-                moreDestinations.contains(destination.id)
+            val moreDestinations = listOf(R.id.aboutFragment, R.id.donationFragment, R.id.contactFragment, R.id.settingsFragment)
+            findViewById<Button>(R.id.nav_more).isSelected = moreDestinations.contains(destination.id)
         }
     }
 
-    // ---------- Radio helpers ----------
     private fun switchStation(delta: Int) {
         currentStation = (currentStation + delta + RadioService.STATIONS.size) % RadioService.STATIONS.size
         val i = Intent(this, RadioService::class.java).apply {
             putExtra(RadioService.EXTRA_STATION_INDEX, currentStation)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            startForegroundService(i)
-        else
-            startService(i)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(i) else startService(i)
         updatePlayerBar()
     }
 
@@ -171,20 +171,13 @@ class MainActivity : AppCompatActivity() {
         binding.playerBar.btnPlayPause.setImageResource(icon)
     }
 
-    // ---------- MediaController listener ----------
     inner class PlayerListener : Player.Listener {
         override fun onIsPlayingChanged(playing: Boolean) {
             isPlaying = playing
             updatePlayPauseIcon()
         }
-
-        override fun onMediaItemTransition(
-            item: androidx.media3.common.MediaItem?,
-            reason: Int
-        ) {
-            val idx = RadioService.STATIONS.indexOfFirst {
-                it.url == item?.localConfiguration?.uri.toString()
-            }
+        override fun onMediaItemTransition(item: androidx.media3.common.MediaItem?, reason: Int) {
+            val idx = RadioService.STATIONS.indexOfFirst { it.url == item?.localConfiguration?.uri.toString() }
             if (idx != -1) {
                 currentStation = idx
                 updatePlayerBar()
