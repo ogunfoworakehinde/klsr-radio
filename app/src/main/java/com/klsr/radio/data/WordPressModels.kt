@@ -1,4 +1,4 @@
-package com.kingdomlifestyleradio.klsradio.data
+package com.klsr.radio.data
 
 import com.google.gson.annotations.SerializedName
 

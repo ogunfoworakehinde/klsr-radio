@@ -1,4 +1,4 @@
-package com.kingdomlifestyleradio.klsradio.ui
+package com.klsr.radio.ui
 
 import android.os.Bundle
 import android.text.Html
@@ -8,9 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
-import com.kingdomlifestyleradio.klsradio.R
-import com.kingdomlifestyleradio.klsradio.data.BlogPostResponse
-import com.kingdomlifestyleradio.klsradio.databinding.FragmentSinglePostBinding
+import com.klsr.radio.R
+import com.klsr.radio.data.BlogPostResponse
+import com.klsr.radio.databinding.FragmentSinglePostBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,9 +25,7 @@ class SinglePostFragment : Fragment(R.layout.fragment_single_post) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentSinglePostBinding.bind(view)
-        binding.backBtn.setOnClickListener {
-            findNavController().popBackStack()
-        }
+        binding.backBtn.setOnClickListener { findNavController().popBackStack() }
         loadPost()
     }
 
@@ -38,6 +36,7 @@ class SinglePostFragment : Fragment(R.layout.fragment_single_post) {
                     val url = URL("https://kingdomlifestyleradio.com/wp/wp-json/wp/v2/posts/$postId?_embed")
                     val conn = url.openConnection() as HttpURLConnection
                     conn.connectTimeout = 15000
+                    conn.readTimeout = 15000
                     val json = conn.inputStream.bufferedReader().readText()
                     Gson().fromJson(json, BlogPostResponse::class.java)
                 } catch (e: Exception) { null }
@@ -50,7 +49,7 @@ class SinglePostFragment : Fragment(R.layout.fragment_single_post) {
                 binding.postAuthor.text = author
                 val imgUrl = p.embedded?.wpFeaturedmedia?.getOrNull(0)?.sourceUrl
                 if (imgUrl != null) {
-                    Glide.with(this@SinglePostFragment).load(imgUrl).into(binding.featuredImage)
+                    Glide.with(requireContext()).load(imgUrl as Any).into(binding.featuredImage)
                 }
                 binding.postContent.text = Html.fromHtml(p.content.rendered, Html.FROM_HTML_MODE_COMPACT)
             }
