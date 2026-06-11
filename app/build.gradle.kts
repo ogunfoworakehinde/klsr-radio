@@ -23,6 +23,7 @@ android {
             storePassword = System.getenv("KEYSTORE_PASSWORD")
             keyAlias = "upload"
             keyPassword = System.getenv("KEY_PASSWORD")
+            storeType = "PKCS12"
         }
     }
 
