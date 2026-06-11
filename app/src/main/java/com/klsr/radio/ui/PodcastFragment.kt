@@ -2,6 +2,7 @@ package com.klsr.radio.ui
 
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -23,7 +24,6 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     private var _binding: FragmentPodcastBinding? = null
     private val binding get() = _binding!!
     private var mediaPlayer: MediaPlayer? = null
-    private var episodes = emptyList<PodcastEpisode>()
     private var currentEpisode: PodcastEpisode? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,14 +36,17 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
         loadPodcasts()
 
         binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
-            currentEpisode?.let { ep ->
-                if (mediaPlayer?.isPlaying == true) {
-                    mediaPlayer?.pause()
-                } else {
-                    mediaPlayer?.start()
-                }
-                updatePlayPauseIcon()
-            }
+            currentEpisode?.let { togglePlayPause() }
+        }
+    }
+
+    private fun togglePlayPause() {
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
+            updatePlayPauseIcon()
+        } else {
+            mediaPlayer?.start()
+            updatePlayPauseIcon()
         }
     }
 
@@ -58,7 +61,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                 try {
                     val url = URL("https://anchor.fm/s/1d6ad87c/podcast/rss")
                     val conn = url.openConnection() as HttpURLConnection
-                    conn.connectTimeout = 10000
+                    conn.connectTimeout = 15000
                     val input = conn.inputStream
                     val factory = XmlPullParserFactory.newInstance()
                     factory.isNamespaceAware = true
@@ -85,7 +88,6 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                                     "enclosure" -> current?.audioUrl = parser.getAttributeValue(null, "url")
                                     "pubDate" -> current?.pubDate = text
                                     "itunes:duration" -> current?.duration = text
-                                    "itunes:author" -> current?.author = text
                                 }
                             }
                             XmlPullParser.END_TAG -> {
@@ -100,10 +102,10 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     }
                     episodes
                 } catch (e: Exception) {
+                    Log.e("PodcastFragment", "Error loading RSS", e)
                     emptyList()
                 }
             }
-            episodes = list
             binding.episodeCountText.text = "${list.size} episodes available"
             binding.podcastRecyclerView.adapter = PodcastAdapter(list) { episode -> playEpisode(episode) }
         }
@@ -111,24 +113,34 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
 
     private fun playEpisode(episode: PodcastEpisode) {
         currentEpisode = episode
+        // Release previous player
         mediaPlayer?.release()
+        mediaPlayer = null
+
+        if (episode.audioUrl.isNullOrBlank()) {
+            Toast.makeText(requireContext(), "No audio URL", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         mediaPlayer = MediaPlayer().apply {
+            setOnPreparedListener {
+                start()
+                updatePlayPauseIcon()
+                binding.playerLayout.currentPodcastTitle.text = episode.title
+                binding.playerLayout.currentPodcastDescription.text = episode.description
+                binding.playerLayout.root.visibility = View.VISIBLE
+            }
+            setOnErrorListener { _, what, extra ->
+                Toast.makeText(requireContext(), "Playback error", Toast.LENGTH_SHORT).show()
+                Log.e("PodcastFragment", "MediaPlayer error: what=$what extra=$extra url=${episode.audioUrl}")
+                true
+            }
             try {
                 setDataSource(episode.audioUrl)
                 prepareAsync()
-                setOnPreparedListener {
-                    start()
-                    updatePlayPauseIcon()
-                    binding.playerLayout.currentPodcastTitle.text = episode.title
-                    binding.playerLayout.currentPodcastDescription.text = episode.description
-                    binding.playerLayout.root.visibility = View.VISIBLE
-                }
-                setOnErrorListener { _, _, _ ->
-                    Toast.makeText(requireContext(), "Playback failed", Toast.LENGTH_SHORT).show()
-                    false
-                }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Unable to play episode", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Cannot play episode", Toast.LENGTH_SHORT).show()
+                Log.e("PodcastFragment", "setDataSource failed", e)
             }
         }
     }

@@ -1,9 +1,13 @@
 package com.klsr.radio.adapters
 
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
+import com.klsr.radio.R
 import com.klsr.radio.data.PodcastEpisode
 import com.klsr.radio.databinding.ItemPodcastBinding
 import java.text.SimpleDateFormat
@@ -28,9 +32,17 @@ class PodcastAdapter(
     inner class VH(private val b: ItemPodcastBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(episode: PodcastEpisode) {
             b.podcastTitle.text = episode.title
-            b.podcastDescription.text = episode.description ?: ""
 
-            // Date format
+            // Strip HTML from description to get clean text
+            val cleanDesc = episode.description?.let {
+                // Remove HTML tags
+                it.replace(Regex("<[^>]+>"), " ")
+                    .replace(Regex("\\s+"), " ")
+                    .trim()
+            } ?: ""
+            b.podcastDescription.text = cleanDesc
+
+            // Date formatting
             try {
                 val inputFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
                 val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
@@ -42,19 +54,17 @@ class PodcastAdapter(
                 b.podcastDate.text = episode.pubDate?.take(10) ?: ""
             }
 
-            // Duration
             b.podcastDuration.text = episode.duration ?: ""
 
-            // Author (if available, otherwise empty)
-            // We don't have a dedicated author field in layout, but we can set it to the meta row?
-            // Actually, the current item layout doesn't have an author TextView, so we skip.
-
-            // Image
-            episode.imageUrl?.let {
-                Glide.with(b.root.context).load(it).into(b.podcastImage)
-            } ?: run {
-                b.podcastImage.setBackgroundColor(0xFF1a235c.toInt())
-            }
+            // Load image with Glide, fallback to a colored placeholder
+            Glide.with(b.root.context)
+                .load(episode.imageUrl)
+                .apply(RequestOptions()
+                    .placeholder(R.drawable.podcast_placeholder)
+                    .error(R.drawable.podcast_placeholder)
+                    .fitCenter()
+                )
+                .into(b.podcastImage)
 
             b.btnPlayEpisode.setOnClickListener { onPlayClick(episode) }
         }
