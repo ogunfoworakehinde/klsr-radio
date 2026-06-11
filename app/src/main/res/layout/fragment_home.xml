@@ -1,47 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimary">
+    android:background="?attr/colorPrimaryDark">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+    <!-- Fading image slider (full screen) -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/heroViewPager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent" />
 
-        <!-- Crash error display (hidden by default) -->
+    <!-- Dark overlay for text readability -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000" />
+
+    <!-- Centered content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp">
+
         <TextView
-            android:id="@+id/tvCrashError"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#990000"
+            android:text="Kingdom Lifestyle Radio"
             android:textColor="#FFFFFF"
-            android:padding="12dp"
-            android:textSize="12sp"
-            android:visibility="gone"
-            android:textIsSelectable="true" />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/heroViewPager"
-            android:layout_width="match_parent"
-            android:layout_height="200dp" />
-
-        <LinearLayout
-            android:id="@+id/dotsLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:textStyle="bold"
             android:gravity="center"
-            android:orientation="horizontal" />
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="24/7 Gospel Inspiration &amp; Transformation"
+            android:textColor="#F0F0F0"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3" />
 
         <Button
             android:id="@+id/btnListenLive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="28dp"
             android:text="Listen Live"
             android:drawableStart="@drawable/ic_radio"
-            android:backgroundTint="#FF5252" />
+            android:drawablePadding="8dp"
+            android:backgroundTint="#FF5252"
+            android:textColor="#FFFFFF"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
     </LinearLayout>
-</ScrollView>
+
+    <!-- Crash error display (hidden by default) -->
+    <TextView
+        android:id="@+id/tvCrashError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="#990000"
+        android:textColor="#FFFFFF"
+        android:padding="12dp"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:textIsSelectable="true" />
+</FrameLayout>
