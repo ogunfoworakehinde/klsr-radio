@@ -11,51 +11,46 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Hero Section -->
-        <LinearLayout
+        <!-- Header -->
+        <TextView
+            android:text="Settings"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Customize your app experience"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Save Button (prominent, full width) -->
+        <Button
+            android:id="@+id/saveSettingsBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:text="Settings"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:text="Customize your app experience"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:textSize="14sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/saveSettingsBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Save Changes"
-                android:drawableStart="@drawable/ic_save"
-                style="@style/Widget.MaterialComponents.Button" />
-        </LinearLayout>
+            android:layout_marginTop="16dp"
+            android:text="SAVE CHANGES"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:backgroundTint="?attr/colorAccent"
+            android:padding="12dp"
+            android:drawableStart="@drawable/ic_save"
+            android:drawablePadding="8dp"
+            app:cornerRadius="8dp" />
 
         <!-- Settings Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="4dp"
+            android:layout_marginTop="16dp"
             app:cardBackgroundColor="?attr/colorSurface"
+            app:cardElevation="4dp"
             app:cardCornerRadius="12dp"
             app:strokeWidth="1dp"
             app:strokeColor="?attr/colorPrimary">
@@ -71,19 +66,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:padding="12dp"
+                    android:padding="16dp"
                     android:background="?attr/colorSurface">
+
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content">
+
                         <TextView
                             android:text="App Theme"
                             android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
+
                         <TextView
                             android:text="Choose your preferred color scheme"
                             android:textColor="?attr/colorOnSurface"
@@ -91,13 +90,28 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
-                    <Spinner
-                        android:id="@+id/themeSpinner"
-                        android:layout_width="140dp"
-                        android:layout_height="48dp"
-                        android:entries="@array/theme_options"
-                        android:background="?attr/colorSurface" />
+
+                    <!-- Custom styled spinner -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/spinner_bg"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="8dp"
+                        android:gravity="center_vertical">
+
+                        <Spinner
+                            android:id="@+id/themeSpinner"
+                            android:layout_width="140dp"
+                            android:layout_height="48dp"
+                            android:entries="@array/theme_options"
+                            android:background="@null"
+                            android:textColor="?attr/colorOnSurface"
+                            android:popupBackground="?attr/colorSurface" />
+                    </LinearLayout>
                 </LinearLayout>
+
+                <View style="@style/Divider" />
 
                 <!-- Radio Volume -->
                 <LinearLayout
@@ -105,19 +119,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:padding="12dp"
+                    android:padding="16dp"
                     android:background="?attr/colorSurface">
+
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content">
+
                         <TextView
                             android:text="Radio Volume"
                             android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
+
                         <TextView
                             android:text="Adjust radio player volume"
                             android:textColor="?attr/colorOnSurface"
@@ -125,12 +143,17 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
+
                     <SeekBar
                         android:id="@+id/radioVolumeSeekBar"
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:max="100" />
+                        android:max="100"
+                        android:thumbTint="?attr/colorAccent"
+                        android:progressTint="?attr/colorAccent" />
                 </LinearLayout>
+
+                <View style="@style/Divider" />
 
                 <!-- Podcast Volume -->
                 <LinearLayout
@@ -138,19 +161,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:padding="12dp"
+                    android:padding="16dp"
                     android:background="?attr/colorSurface">
+
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content">
+
                         <TextView
                             android:text="Podcast Volume"
                             android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
+
                         <TextView
                             android:text="Adjust podcast player volume"
                             android:textColor="?attr/colorOnSurface"
@@ -158,12 +185,17 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
+
                     <SeekBar
                         android:id="@+id/podcastVolumeSeekBar"
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:max="100" />
+                        android:max="100"
+                        android:thumbTint="?attr/colorAccent"
+                        android:progressTint="?attr/colorAccent" />
                 </LinearLayout>
+
+                <View style="@style/Divider" />
 
                 <!-- Auto-play Radio -->
                 <LinearLayout
@@ -171,19 +203,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:padding="12dp"
+                    android:padding="16dp"
                     android:background="?attr/colorSurface">
+
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content">
+
                         <TextView
                             android:text="Auto-play Radio"
                             android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
+
                         <TextView
                             android:text="Start playing radio when app opens"
                             android:textColor="?attr/colorOnSurface"
@@ -191,11 +227,16 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
+
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/autoPlaySwitch"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:thumbTint="?attr/colorAccent"
+                        android:trackTint="?attr/colorPrimary" />
                 </LinearLayout>
+
+                <View style="@style/Divider" />
 
                 <!-- Notifications -->
                 <LinearLayout
@@ -203,19 +244,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:padding="12dp"
+                    android:padding="16dp"
                     android:background="?attr/colorSurface">
+
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content">
+
                         <TextView
                             android:text="Notifications"
                             android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
+
                         <TextView
                             android:text="Receive prayer reminders and updates"
                             android:textColor="?attr/colorOnSurface"
@@ -223,11 +268,16 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
+
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/notificationsSwitch"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:thumbTint="?attr/colorAccent"
+                        android:trackTint="?attr/colorPrimary" />
                 </LinearLayout>
+
+                <View style="@style/Divider" />
 
                 <!-- Data Saver -->
                 <LinearLayout
@@ -235,19 +285,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:padding="12dp"
+                    android:padding="16dp"
                     android:background="?attr/colorSurface">
+
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content">
+
                         <TextView
                             android:text="Data Saver"
                             android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
+
                         <TextView
                             android:text="Reduce data usage for streaming"
                             android:textColor="?attr/colorOnSurface"
@@ -255,30 +309,27 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
+
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/dataSaverSwitch"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:thumbTint="?attr/colorAccent"
+                        android:trackTint="?attr/colorPrimary" />
                 </LinearLayout>
 
                 <!-- Reset Settings -->
-                <LinearLayout
-                    android:orientation="horizontal"
+                <Button
+                    android:id="@+id/resetSettingsBtn"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="?attr/colorSurface">
-                    <Button
-                        android:id="@+id/resetSettingsBtn"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Reset Settings"
-                        android:drawableStart="@drawable/ic_reset"
-                        android:textColor="?attr/colorOnSurface" />
-                </LinearLayout>
-
+                    android:layout_margin="16dp"
+                    android:text="Reset Settings"
+                    android:textColor="?attr/colorAccent"
+                    android:strokeColor="?attr/colorAccent"
+                    android:drawableStart="@drawable/ic_reset"
+                    android:drawablePadding="8dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
