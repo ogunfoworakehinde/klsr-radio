@@ -131,12 +131,19 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
             return
         }
 
+        // Clean HTML from description for the player bar
+        val cleanDesc = episode.description?.let {
+            it.replace(Regex("<[^>]+>"), " ")
+              .replace(Regex("\\s+"), " ")
+              .trim()
+        } ?: ""
+
         mediaPlayer = MediaPlayer().apply {
             setOnPreparedListener {
                 start()
                 updatePlayPauseIcon()
                 binding.playerLayout.currentPodcastTitle.text = episode.title
-                binding.playerLayout.currentPodcastDescription.text = episode.description
+                binding.playerLayout.currentPodcastDescription.text = cleanDesc
                 binding.playerLayout.root.visibility = View.VISIBLE
             }
             setOnErrorListener { _, _, _ ->

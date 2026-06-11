@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="?attr/colorPrimary">
 
-    <!-- Toolbar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -28,7 +27,9 @@
                     android:layout_height="36dp"
                     android:layout_marginStart="12dp"
                     android:src="@mipmap/ic_launcher"
-                    android:contentDescription="Logo" />
+                    android:background="@drawable/logo_border_dynamic"
+                    android:padding="2dp"
+                    android:contentDescription="KLSR Logo" />
                 <TextView
                     android:id="@+id/toolbarTitle"
                     android:layout_width="wrap_content"
@@ -52,7 +53,6 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Fragment container -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -63,7 +63,6 @@
         app:navGraph="@navigation/nav_graph"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <!-- Player bar -->
     <include
         android:id="@+id/player_bar"
         layout="@layout/layout_player_bar"
@@ -72,7 +71,6 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="?attr/actionBarSize" />
 
-    <!-- Custom Bottom Navigation (auto‑spaced, no fixed margin) -->
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"

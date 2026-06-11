@@ -8,11 +8,11 @@
         <item name="colorOnSurface">#000000</item>
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
-        <!-- Navigation (Deep Blue) -->
-        <item name="colorNavDefault">#40608070</item>          <!-- soft grey/slate (semi‑transparent) -->
-        <item name="colorNavActive">#0a0f2d</item>             <!-- deep blue -->
-        <item name="colorNavTextDefault">#FFFFFF</item>        <!-- white -->
-        <item name="colorNavTextActive">#FFFFFF</item>         <!-- white -->
+        <item name="colorNavDefault">#40608070</item>
+        <item name="colorNavActive">#0a0f2d</item>
+        <item name="colorNavTextDefault">#FFFFFF</item>
+        <item name="colorNavTextActive">#FFFFFF</item>
+        <item name="colorLogoBorder">#FFFFFF</item>        <!-- white -->
     </style>
     <style name="Theme.Splash" parent="Theme.KLSRRadio">
         <item name="android:windowBackground">@color/splash_bg</item>
