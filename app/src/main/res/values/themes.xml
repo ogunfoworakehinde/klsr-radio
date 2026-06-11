@@ -8,9 +8,9 @@
         <item name="colorOnSurface">#000000</item>
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
-        <!-- Nav attributes: Deep Blue -->
+        <!-- Nav: Deep Blue -->
         <item name="colorNavDefault">#0a0f2d</item>
-        <item name="colorNavActive">#3a5ba0</item>   <!-- lighter blue -->
+        <item name="colorNavActive">#1a3a6e</item>    <!-- lighter blue -->
         <item name="colorNavTextDefault">#FFFFFF</item>
         <item name="colorNavTextActive">#FFFFFF</item>
     </style>

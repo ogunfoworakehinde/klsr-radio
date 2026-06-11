@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private var mediaController: MediaController? = null
     private var currentStation = 0
+    // Track current play state locally for immediate icon updates
     private var isPlaying = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,19 +37,22 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        // Notification permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED)
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
         }
 
+        // NavController
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         setupCustomBottomNav()
 
+        // Settings button in toolbar
         binding.btnSettings.setOnClickListener { navController.navigate(R.id.settingsFragment) }
 
-        // MediaController
+        // Connect to the MediaController (may already be running from HomeFragment)
         try {
             val token = SessionToken(this, ComponentName(this, RadioService::class.java))
             val future = MediaController.Builder(this, token).buildAsync()
@@ -57,38 +61,45 @@ class MainActivity : AppCompatActivity() {
                     mediaController = future.get()
                     mediaController?.addListener(PlayerListener())
                     isPlaying = mediaController?.isPlaying ?: false
-                    updatePlayPauseIcon(isPlaying)
+                    updatePlayPauseIcon()
                     updatePlayerBar()
                 } catch (e: Exception) { Log.e("MainActivity", "MC get failed", e) }
             }, MoreExecutors.directExecutor())
         } catch (e: Exception) { Log.e("MainActivity", "SessionToken failed", e) }
 
-        // Player bar – toggle using MediaController if available, else start service
+        // ---------- Player bar buttons ----------
+        // Play/Pause: send ACTION_PLAY_PAUSE intent (exactly like the lock screen)
         binding.playerBar.btnPlayPause.setOnClickListener {
-            val mc = mediaController
-            if (mc != null) {
-                if (mc.isPlaying) mc.pause() else mc.play()
-                // Icon will be updated by the listener callback
-            } else {
-                // service not connected yet, start it
-                ensureServiceStarted()
-                // assume it will start playing
-                isPlaying = true
-                updatePlayPauseIcon(true)
+            val intent = Intent(this, RadioService::class.java).apply {
+                action = RadioService.ACTION_PLAY_PAUSE
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                startForegroundService(intent)
+            else
+                startService(intent)
+
+            // Immediately toggle the local state and icon, then rely on the listener to correct if needed
+            isPlaying = !isPlaying
+            updatePlayPauseIcon()
         }
+
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
+
         binding.playerBar.btnChannelSwitcher.setOnClickListener {
             val bottomSheet = ChannelSwitcherFragment()
             bottomSheet.show(supportFragmentManager, "ChannelSwitcher")
-            supportFragmentManager.setFragmentResultListener(ChannelSwitcherFragment.REQUEST_KEY, this) { _, bundle ->
+            supportFragmentManager.setFragmentResultListener(
+                ChannelSwitcherFragment.REQUEST_KEY, this
+            ) { _, bundle ->
                 val index = bundle.getInt(ChannelSwitcherFragment.RESULT_INDEX, -1)
-                if (index != -1 && index != currentStation) switchStation(index - currentStation)
+                if (index != -1 && index != currentStation)
+                    switchStation(index - currentStation)
             }
         }
     }
 
+    // ---------- Custom bottom navigation ----------
     private fun setupCustomBottomNav() {
         val buttonMap = mapOf(
             R.id.nav_home to R.id.homeFragment,
@@ -121,24 +132,30 @@ class MainActivity : AppCompatActivity() {
             popup.show()
         }
 
+        // Highlight active button
         navController.addOnDestinationChangedListener { _, destination, _ ->
             buttonMap.entries.forEach { (btnId, destId) ->
                 findViewById<Button>(btnId).isSelected = (destination.id == destId)
             }
-            val moreDestinations = listOf(R.id.aboutFragment, R.id.donationFragment, R.id.contactFragment, R.id.settingsFragment)
-            findViewById<Button>(R.id.nav_more).isSelected = moreDestinations.contains(destination.id)
+            val moreDestinations = listOf(
+                R.id.aboutFragment, R.id.donationFragment,
+                R.id.contactFragment, R.id.settingsFragment
+            )
+            findViewById<Button>(R.id.nav_more).isSelected =
+                moreDestinations.contains(destination.id)
         }
     }
 
-    private fun ensureServiceStarted() {
-        val i = Intent(this, RadioService::class.java).apply { putExtra(RadioService.EXTRA_STATION_INDEX, currentStation) }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(i) else startService(i)
-    }
-
+    // ---------- Radio helpers ----------
     private fun switchStation(delta: Int) {
         currentStation = (currentStation + delta + RadioService.STATIONS.size) % RadioService.STATIONS.size
-        val i = Intent(this, RadioService::class.java).apply { putExtra(RadioService.EXTRA_STATION_INDEX, currentStation) }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(i) else startService(i)
+        val i = Intent(this, RadioService::class.java).apply {
+            putExtra(RadioService.EXTRA_STATION_INDEX, currentStation)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            startForegroundService(i)
+        else
+            startService(i)
         updatePlayerBar()
     }
 
@@ -146,23 +163,32 @@ class MainActivity : AppCompatActivity() {
         val s = RadioService.STATIONS[currentStation]
         binding.playerBar.stationName.text = s.name
         binding.playerBar.stationDesc.text = s.desc
-        updatePlayPauseIcon(mc?.isPlaying ?: false)
+        updatePlayPauseIcon()
     }
 
-    private fun updatePlayPauseIcon(playing: Boolean) {
-        isPlaying = playing
-        val icon = if (playing) R.drawable.ic_pause else R.drawable.ic_play_arrow
+    private fun updatePlayPauseIcon() {
+        val icon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
         binding.playerBar.btnPlayPause.setImageResource(icon)
     }
 
+    // ---------- MediaController listener ----------
     inner class PlayerListener : Player.Listener {
         override fun onIsPlayingChanged(playing: Boolean) {
-            runOnUiThread { updatePlayPauseIcon(playing) }
+            isPlaying = playing
+            updatePlayPauseIcon()
         }
-        override fun onMediaItemTransition(item: androidx.media3.common.MediaItem?, reason: Int) {
-            val idx = RadioService.STATIONS.indexOfFirst { it.url == item?.localConfiguration?.uri.toString() }
-            if (idx != -1) currentStation = idx
-            runOnUiThread { updatePlayerBar() }
+
+        override fun onMediaItemTransition(
+            item: androidx.media3.common.MediaItem?,
+            reason: Int
+        ) {
+            val idx = RadioService.STATIONS.indexOfFirst {
+                it.url == item?.localConfiguration?.uri.toString()
+            }
+            if (idx != -1) {
+                currentStation = idx
+                updatePlayerBar()
+            }
         }
     }
 }
