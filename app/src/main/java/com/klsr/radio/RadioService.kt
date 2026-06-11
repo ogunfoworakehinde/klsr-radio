@@ -24,6 +24,8 @@ class RadioService : Service() {
         const val NOTIFY_ID = 101
         const val ACTION_PLAY_PAUSE = "com.klsr.radio.PLAY_PAUSE"
         const val ACTION_STOP = "com.klsr.radio.STOP"
+        const val ACTION_NEXT = "com.klsr.radio.NEXT"
+        const val ACTION_PREV = "com.klsr.radio.PREV"
         const val EXTRA_STATION_INDEX = "station_index"
         val STATIONS = arrayOf(
             Station("English Gospel", "https://s3.voscast.com:9425/stream", "24/7 English Gospel Music"),
@@ -38,7 +40,7 @@ class RadioService : Service() {
         super.onCreate()
         createChannel()
         player = ExoPlayer.Builder(this).build()
-        mediaSession = MediaSession.Builder(this, player).build()  // no custom callback needed
+        mediaSession = MediaSession.Builder(this, player).build()
         playStation(stationIndex)
     }
 
@@ -57,6 +59,14 @@ class RadioService : Service() {
             ACTION_STOP -> {
                 stopSelf()
                 return START_NOT_STICKY
+            }
+            ACTION_NEXT -> {
+                stationIndex = (stationIndex + 1) % STATIONS.size
+                playStation(stationIndex)
+            }
+            ACTION_PREV -> {
+                stationIndex = if (stationIndex == 0) STATIONS.size - 1 else stationIndex - 1
+                playStation(stationIndex)
             }
             else -> {
                 intent?.getIntExtra(EXTRA_STATION_INDEX, -1)?.let { idx ->
@@ -90,6 +100,7 @@ class RadioService : Service() {
         val openIntent = PendingIntent.getActivity(this, 0,
             Intent(this, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
+        // Play/Pause action
         val ppIcon = if (player.isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
         val ppAction = NotificationCompat.Action(ppIcon,
             if (player.isPlaying) "Pause" else "Play",
@@ -97,6 +108,21 @@ class RadioService : Service() {
                 Intent(this, RadioService::class.java).apply { action = ACTION_PLAY_PAUSE },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
 
+        // Previous action
+        val prevAction = NotificationCompat.Action(
+            android.R.drawable.ic_media_previous, "Previous",
+            PendingIntent.getService(this, 2,
+                Intent(this, RadioService::class.java).apply { action = ACTION_PREV },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+
+        // Next action
+        val nextAction = NotificationCompat.Action(
+            android.R.drawable.ic_media_next, "Next",
+            PendingIntent.getService(this, 3,
+                Intent(this, RadioService::class.java).apply { action = ACTION_NEXT },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+
+        // Cancel (stop) action
         val stopAction = NotificationCompat.Action(
             android.R.drawable.ic_menu_close_clear_cancel, "Cancel",
             PendingIntent.getService(this, 1,
@@ -110,10 +136,12 @@ class RadioService : Service() {
             .setContentIntent(openIntent)
             .setOngoing(player.isPlaying)
             .addAction(stopAction)
+            .addAction(prevAction)
             .addAction(ppAction)
+            .addAction(nextAction)
             .setStyle(
                 MediaStyleNotificationHelper.MediaStyle(mediaSession)
-                    .setShowActionsInCompactView(0, 1)
+                    .setShowActionsInCompactView(1, 2, 3) // prev, play/pause, next
             )
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
