@@ -39,7 +39,6 @@ class BlogHeroSliderAdapter(
             date.text = post.date
             excerpt.text = post.excerpt
 
-            // Load image with Glide, fallback to placeholder color if fails
             post.featuredMediaUrl?.let { url ->
                 Glide.with(itemView.context)
                     .load(url)
