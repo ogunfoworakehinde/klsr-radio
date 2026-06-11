@@ -17,13 +17,34 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <EditText android:id="@+id/contactNameEditText" android:hint="Your Name *" android:textColor="?attr/colorOnSurface" />
-        <EditText android:id="@+id/contactEmailEditText" android:hint="Email *" android:inputType="textEmailAddress" android:textColor="?attr/colorOnSurface" />
-        <EditText android:id="@+id/contactSubjectEditText" android:hint="Subject *" android:textColor="?attr/colorOnSurface" />
-        <EditText android:id="@+id/contactMessageEditText" android:hint="Message *" android:minLines="4"
-            android:gravity="top" android:layout_marginBottom="16dp" android:textColor="?attr/colorOnSurface" />
-        <Button android:id="@+id/sendContactBtn" android:text="Send Message"
+        <EditText android:id="@+id/contactNameEditText"
+            android:hint="Your Name *"
+            android:background="@android:drawable/edit_text"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurface" />
+        <EditText android:id="@+id/contactEmailEditText"
+            android:hint="Email *"
+            android:inputType="textEmailAddress"
+            android:background="@android:drawable/edit_text"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurface" />
+        <EditText android:id="@+id/contactSubjectEditText"
+            android:hint="Subject *"
+            android:background="@android:drawable/edit_text"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurface" />
+        <EditText android:id="@+id/contactMessageEditText"
+            android:hint="Message *"
+            android:minLines="4"
+            android:gravity="top"
+            android:layout_marginBottom="16dp"
+            android:background="@android:drawable/edit_text"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurface" />
+        <Button android:id="@+id/sendContactBtn"
+            android:text="Send Message"
             style="@style/Widget.MaterialComponents.Button"
-            android:backgroundTint="?attr/colorPrimary" android:textColor="?attr/colorOnPrimary" />
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="?attr/colorOnPrimary" />
     </LinearLayout>
 </ScrollView>
