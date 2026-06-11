@@ -11,8 +11,7 @@
     <item android:id="@+id/blogFragment"
         android:title="Blog"
         android:icon="@drawable/ic_article" />
-    <!-- "More" handled by popup, id does not match any fragment -->
-    <item android:id="@+id/moreMenuItem"
+    <item android:id="@+id/moreFragment"
         android:title="More"
         android:icon="@drawable/ic_more_horiz" />
 </menu>
