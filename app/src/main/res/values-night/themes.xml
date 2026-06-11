@@ -8,10 +8,10 @@
         <item name="colorOnSurface">#FFFFFF</item>
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
-        <!-- Nav colors for Dark -->
-        <item name="colorNavDefault">#40B8860B</item>          <!-- semi-transparent dark gold -->
+        <!-- Navigation (Dark) -->
+        <item name="colorNavDefault">#40B8860B</item>          <!-- muted dark gold (olive‑gold) -->
         <item name="colorNavActive">#FFD700</item>             <!-- solid golden yellow -->
-        <item name="colorNavTextDefault">#80FFFFFF</item>      <!-- semi-transparent white -->
+        <item name="colorNavTextDefault">#80FFFFFF</item>      <!-- semi‑transparent white -->
         <item name="colorNavTextActive">#FFFFFF</item>         <!-- solid white -->
     </style>
 </resources>

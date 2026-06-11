@@ -32,7 +32,6 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
 
         binding.podcastHeroImage.setImageResource(R.drawable.hepp)
         binding.podcastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-
         loadPodcasts()
 
         binding.playerLayout.btnPodcastPlayPause.setOnClickListener {
@@ -43,11 +42,10 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
     private fun togglePlayPause() {
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.pause()
-            updatePlayPauseIcon()
         } else {
             mediaPlayer?.start()
-            updatePlayPauseIcon()
         }
+        updatePlayPauseIcon()
     }
 
     private fun updatePlayPauseIcon() {
@@ -67,27 +65,39 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     factory.isNamespaceAware = true
                     val parser = factory.newPullParser()
                     parser.setInput(input, null)
-                    var eventType = parser.eventType
                     val episodes = mutableListOf<PodcastEpisode>()
                     var current: PodcastEpisode? = null
                     var tag = ""
+                    var eventType = parser.eventType
                     while (eventType != XmlPullParser.END_DOCUMENT) {
                         when (eventType) {
                             XmlPullParser.START_TAG -> {
                                 tag = parser.name
-                                if (tag == "item") {
-                                    current = PodcastEpisode()
+                                when (tag) {
+                                    "item" -> current = PodcastEpisode()
+                                    "itunes:image", "image" -> {
+                                        val href = parser.getAttributeValue(null, "href")
+                                        if (href != null && current != null) {
+                                            current!!.imageUrl = href
+                                        }
+                                    }
+                                    "enclosure" -> {
+                                        val audioUrl = parser.getAttributeValue(null, "url")
+                                        if (audioUrl != null && current != null) {
+                                            current!!.audioUrl = audioUrl
+                                        }
+                                    }
                                 }
                             }
                             XmlPullParser.TEXT -> {
-                                val text = parser.text ?: ""
-                                when (tag) {
-                                    "title" -> current?.title = text
-                                    "description" -> current?.description = text
-                                    "itunes:image" -> current?.imageUrl = parser.getAttributeValue(null, "href")
-                                    "enclosure" -> current?.audioUrl = parser.getAttributeValue(null, "url")
-                                    "pubDate" -> current?.pubDate = text
-                                    "itunes:duration" -> current?.duration = text
+                                if (current != null) {
+                                    val text = parser.text ?: ""
+                                    when (tag) {
+                                        "title" -> current!!.title = text
+                                        "description" -> current!!.description = text
+                                        "pubDate" -> current!!.pubDate = text
+                                        "itunes:duration" -> current!!.duration = text
+                                    }
                                 }
                             }
                             XmlPullParser.END_TAG -> {
@@ -102,7 +112,7 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                     }
                     episodes
                 } catch (e: Exception) {
-                    Log.e("PodcastFragment", "Error loading RSS", e)
+                    Log.e("PodcastFragment", "RSS error", e)
                     emptyList()
                 }
             }
@@ -113,7 +123,6 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
 
     private fun playEpisode(episode: PodcastEpisode) {
         currentEpisode = episode
-        // Release previous player
         mediaPlayer?.release()
         mediaPlayer = null
 
@@ -130,9 +139,8 @@ class PodcastFragment : Fragment(R.layout.fragment_podcast) {
                 binding.playerLayout.currentPodcastDescription.text = episode.description
                 binding.playerLayout.root.visibility = View.VISIBLE
             }
-            setOnErrorListener { _, what, extra ->
+            setOnErrorListener { _, _, _ ->
                 Toast.makeText(requireContext(), "Playback error", Toast.LENGTH_SHORT).show()
-                Log.e("PodcastFragment", "MediaPlayer error: what=$what extra=$extra url=${episode.audioUrl}")
                 true
             }
             try {
