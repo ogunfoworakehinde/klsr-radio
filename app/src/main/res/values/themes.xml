@@ -1,16 +1,19 @@
 <resources>
-    <!-- Deep Blue (Light) -->
     <style name="Theme.KLSRRadio" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">#0a0f2d</item>
         <item name="colorPrimaryDark">#05081a</item>
-        <item name="colorAccent">#0a0f2d</item>   <!-- buttons, active nav -->
+        <item name="colorAccent">#0a0f2d</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorSurface">#FFFFFF</item>
         <item name="colorOnSurface">#000000</item>
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
+        <!-- Nav attributes: Deep Blue -->
+        <item name="colorNavDefault">#0a0f2d</item>
+        <item name="colorNavActive">#3a5ba0</item>   <!-- lighter blue -->
+        <item name="colorNavTextDefault">#FFFFFF</item>
+        <item name="colorNavTextActive">#FFFFFF</item>
     </style>
-
     <style name="Theme.Splash" parent="Theme.KLSRRadio">
         <item name="android:windowBackground">@color/splash_bg</item>
     </style>

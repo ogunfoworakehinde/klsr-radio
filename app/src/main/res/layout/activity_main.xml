@@ -17,14 +17,12 @@
             app:contentInsetStart="0dp"
             app:contentInsetEnd="0dp">
 
-            <!-- Custom toolbar content -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <!-- Logo and app name -->
                 <ImageView
                     android:id="@+id/toolbarLogo"
                     android:layout_width="36dp"
@@ -43,13 +41,8 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <!-- Spacer to push settings to the right -->
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+                <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
 
-                <!-- Settings icon -->
                 <ImageButton
                     android:id="@+id/btnSettings"
                     android:layout_width="48dp"
@@ -63,18 +56,17 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Fragment container -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="112dp"
+        android:layout_marginBottom="120dp"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <!-- Player bar (bottom, above nav) -->
+    <!-- Player bar -->
     <include
         android:id="@+id/player_bar"
         layout="@layout/layout_player_bar"
@@ -83,16 +75,95 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="?attr/actionBarSize" />
 
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+    <!-- Custom Bottom Navigation -->
+    <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
         android:background="?attr/colorPrimaryDark"
-        app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="@color/bottom_nav_item_color"
-        app:itemTextColor="@color/bottom_nav_item_color"
-        app:labelVisibilityMode="labeled" />
+        android:paddingHorizontal="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
+        <Button android:drawableTint="@drawable/nav_item_text_color"
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:text="Home"
+            android:drawableTop="@drawable/ic_home"
+            android:drawablePadding="2dp"
+            android:background="@drawable/nav_item_bg"
+            android:textColor="@drawable/nav_item_text_color"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
+
+        <Button android:drawableTint="@drawable/nav_item_text_color"
+            android:id="@+id/nav_podcast"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:text="Podcasts"
+            android:drawableTop="@drawable/ic_podcasts"
+            android:drawablePadding="2dp"
+            android:background="@drawable/nav_item_bg"
+            android:textColor="@drawable/nav_item_text_color"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
+
+        <Button android:drawableTint="@drawable/nav_item_text_color"
+            android:id="@+id/nav_prayer"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:text="Prayer"
+            android:drawableTop="@drawable/ic_prayer"
+            android:drawablePadding="2dp"
+            android:background="@drawable/nav_item_bg"
+            android:textColor="@drawable/nav_item_text_color"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
+
+        <Button android:drawableTint="@drawable/nav_item_text_color"
+            android:id="@+id/nav_blog"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:text="Blog"
+            android:drawableTop="@drawable/ic_article"
+            android:drawablePadding="2dp"
+            android:background="@drawable/nav_item_bg"
+            android:textColor="@drawable/nav_item_text_color"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
+
+        <Button android:drawableTint="@drawable/nav_item_text_color"
+            android:id="@+id/nav_more"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:text="More"
+            android:drawableTop="@drawable/ic_more_horiz"
+            android:drawablePadding="2dp"
+            android:background="@drawable/nav_item_bg"
+            android:textColor="@drawable/nav_item_text_color"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
+    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

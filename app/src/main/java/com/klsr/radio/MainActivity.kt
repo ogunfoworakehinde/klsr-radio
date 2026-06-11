@@ -4,11 +4,12 @@ import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -20,7 +21,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.common.util.concurrent.MoreExecutors
 import com.klsr.radio.databinding.ActivityMainBinding
-import com.klsr.radio.ui.ChannelSwitcherFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -44,15 +44,13 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        setupBottomNav()
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            binding.bottomNav.menu.findItem(destination.id)?.isChecked = true
-        }
+        // Set up custom bottom nav
+        setupCustomBottomNav()
 
         binding.btnSettings.setOnClickListener { navController.navigate(R.id.settingsFragment) }
 
-        // MediaController – connect to the already running service
+        // MediaController
         try {
             val token = SessionToken(this, ComponentName(this, RadioService::class.java))
             val future = MediaController.Builder(this, token).buildAsync()
@@ -65,15 +63,13 @@ class MainActivity : AppCompatActivity() {
             }, MoreExecutors.directExecutor())
         } catch (e: Exception) { Log.e("MainActivity", "SessionToken failed", e) }
 
-        // Player bar buttons – use MediaController directly, always
+        // Player bar – use intent for reliable play/pause
         binding.playerBar.btnPlayPause.setOnClickListener {
-            val mc = mediaController
-            if (mc == null) {
-                ensureServiceStarted()
-                return@setOnClickListener
+            val intent = Intent(this, RadioService::class.java).apply {
+                action = RadioService.ACTION_PLAY_PAUSE
             }
-            // Toggle exactly like the lock-screen does
-            if (mc.isPlaying) mc.pause() else mc.play()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(intent)
+            else startService(intent)
         }
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
@@ -87,45 +83,50 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupBottomNav() {
-        val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-                android.content.res.Configuration.UI_MODE_NIGHT_YES
-        val activeColor = if (isDark) Color.parseColor("#FFD700") else Color.parseColor("#4fc3f7")
-        val colorStateList = ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-            intArrayOf(activeColor, Color.WHITE)
+    private fun setupCustomBottomNav() {
+        // Map button IDs to navigation destinations
+        val buttonMap = mapOf(
+            R.id.nav_home to R.id.homeFragment,
+            R.id.nav_podcast to R.id.podcastFragment,
+            R.id.nav_prayer to R.id.prayerFragment,
+            R.id.nav_blog to R.id.blogFragment
         )
-        binding.bottomNav.itemIconTintList = colorStateList
-        binding.bottomNav.itemTextColor = colorStateList
+        // "More" button handled separately
 
-        binding.bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.moreMenuItem -> { showMoreMenu(); false }
-                else -> {
-                    navController.navigate(item.itemId, null,
-                        androidx.navigation.NavOptions.Builder()
-                            .setPopUpTo(navController.graph.startDestinationId, false)
-                            .setLaunchSingleTop(true).build())
-                    true
+        buttonMap.forEach { (btnId, destId) ->
+            findViewById<Button>(btnId).setOnClickListener {
+                navController.navigate(destId, null,
+                    androidx.navigation.NavOptions.Builder()
+                        .setPopUpTo(navController.graph.startDestinationId, false)
+                        .setLaunchSingleTop(true).build())
+            }
+        }
+
+        findViewById<Button>(R.id.nav_more).setOnClickListener {
+            val popup = PopupMenu(this, it)
+            popup.menuInflater.inflate(R.menu.more_popup_menu, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_about -> navController.navigate(R.id.aboutFragment)
+                    R.id.action_donate -> navController.navigate(R.id.donationFragment)
+                    R.id.action_contact -> navController.navigate(R.id.contactFragment)
+                    R.id.action_settings -> navController.navigate(R.id.settingsFragment)
                 }
+                true
             }
+            popup.show()
         }
-    }
 
-    private fun showMoreMenu() {
-        val menuItemView = binding.bottomNav.findViewById<android.view.View>(R.id.moreMenuItem)
-        val popup = PopupMenu(this, menuItemView)
-        popup.menuInflater.inflate(R.menu.more_popup_menu, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_about -> navController.navigate(R.id.aboutFragment)
-                R.id.action_donate -> navController.navigate(R.id.donationFragment)
-                R.id.action_contact -> navController.navigate(R.id.contactFragment)
-                R.id.action_settings -> navController.navigate(R.id.settingsFragment)
+        // Highlight correct button based on current destination
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            buttonMap.entries.forEach { (btnId, destId) ->
+                val btn = findViewById<Button>(btnId)
+                btn.isSelected = (destination.id == destId)
             }
-            true
+            // "More" is selected if destination is about/donation/contact/settings
+            val moreDestinations = listOf(R.id.aboutFragment, R.id.donationFragment, R.id.contactFragment, R.id.settingsFragment)
+            findViewById<Button>(R.id.nav_more).isSelected = moreDestinations.contains(destination.id)
         }
-        popup.show()
     }
 
     private fun ensureServiceStarted() {
