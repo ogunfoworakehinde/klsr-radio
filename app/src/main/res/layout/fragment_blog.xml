@@ -5,18 +5,6 @@
     android:background="?attr/colorPrimary"
     android:orientation="vertical">
 
-    <!-- Error display (hidden until crash) -->
-    <TextView
-        android:id="@+id/blogErrorText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#990000"
-        android:textColor="#FFFFFF"
-        android:padding="12dp"
-        android:textSize="12sp"
-        android:visibility="gone"
-        android:textIsSelectable="true" />
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -30,8 +18,7 @@
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/blogHeroViewPager"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:visibility="gone" />
+                android:layout_height="250dp" />
 
             <LinearLayout
                 android:id="@+id/blogHeroDots"
@@ -39,8 +26,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="8dp"
-                android:visibility="gone" />
+                android:padding="8dp" />
 
             <EditText
                 android:id="@+id/searchEditText"
