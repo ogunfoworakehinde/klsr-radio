@@ -4,12 +4,15 @@ import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.session.MediaController
@@ -25,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private var mediaController: MediaController? = null
     private var currentStation = 0
+    private var isPlaying = false // local tracking for immediate UI update
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,25 +50,8 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // Bottom navigation – manual selection
-        binding.bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.moreMenuItem -> {
-                    showMoreMenu()
-                    false // don't select
-                }
-                else -> {
-                    // Navigate to corresponding fragment (item ID must match fragment ID)
-                    navController.navigate(item.itemId, null,
-                        androidx.navigation.NavOptions.Builder()
-                            .setPopUpTo(navController.graph.startDestinationId, false)
-                            .setLaunchSingleTop(true)
-                            .build()
-                    )
-                    true
-                }
-            }
-        }
+        // Bottom navigation – manual selection + highlight color
+        setupBottomNav()
 
         // Sync bottom nav with current destination
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -84,6 +71,7 @@ class MainActivity : AppCompatActivity() {
                 try {
                     mediaController = future.get()
                     mediaController?.addListener(PlayerListener())
+                    isPlaying = mediaController?.isPlaying ?: false
                     updatePlayerBar()
                 } catch (e: Exception) { Log.e("MainActivity", "MC get failed", e) }
             }, MoreExecutors.directExecutor())
@@ -98,7 +86,13 @@ class MainActivity : AppCompatActivity() {
                     ensureServiceStarted()
                     mc.play()
                 }
-            } ?: ensureServiceStarted()
+                isPlaying = !isPlaying
+                updatePlayPauseIcon()
+            } ?: run {
+                ensureServiceStarted()
+                isPlaying = true
+                updatePlayPauseIcon()
+            }
         }
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
@@ -109,6 +103,43 @@ class MainActivity : AppCompatActivity() {
                 val index = bundle.getInt(ChannelSwitcherFragment.RESULT_INDEX, -1)
                 if (index != -1 && index != currentStation) {
                     switchStation(index - currentStation)
+                }
+            }
+        }
+    }
+
+    private fun setupBottomNav() {
+        // Determine active highlight color based on night mode
+        val nightModeFlags = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        val isDark = nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+        val activeColor = if (isDark) Color.parseColor("#FFD700") else Color.parseColor("#4fc3f7") // gold / light blue
+        val inactiveColor = Color.WHITE
+
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_checked),
+            intArrayOf()
+        )
+        val colors = intArrayOf(activeColor, inactiveColor)
+        val colorStateList = ColorStateList(states, colors)
+
+        binding.bottomNav.itemIconTintList = colorStateList
+        binding.bottomNav.itemTextColor = colorStateList
+
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.moreMenuItem -> {
+                    showMoreMenu()
+                    false
+                }
+                else -> {
+                    navController.navigate(item.itemId, null,
+                        androidx.navigation.NavOptions.Builder()
+                            .setPopUpTo(navController.graph.startDestinationId, false)
+                            .setLaunchSingleTop(true)
+                            .build()
+                    )
+                    true
                 }
             }
         }
@@ -146,12 +177,19 @@ class MainActivity : AppCompatActivity() {
         val s = RadioService.STATIONS[currentStation]
         binding.playerBar.stationName.text = s.name
         binding.playerBar.stationDesc.text = s.desc
-        val icon = if (mc?.isPlaying == true) R.drawable.ic_pause else R.drawable.ic_play_arrow
+        updatePlayPauseIcon()
+    }
+
+    private fun updatePlayPauseIcon() {
+        val icon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
         binding.playerBar.btnPlayPause.setImageResource(icon)
     }
 
     inner class PlayerListener : androidx.media3.common.Player.Listener {
-        override fun onIsPlayingChanged(isPlaying: Boolean) { updatePlayerBar() }
+        override fun onIsPlayingChanged(playing: Boolean) {
+            isPlaying = playing
+            updatePlayPauseIcon()
+        }
         override fun onMediaItemTransition(item: androidx.media3.common.MediaItem?, reason: Int) {
             val idx = RadioService.STATIONS.indexOfFirst { it.url == item?.localConfiguration?.uri.toString() }
             if (idx != -1) currentStation = idx

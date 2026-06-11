@@ -1,11 +1,14 @@
 package com.klsr.radio.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.klsr.radio.R
 import com.klsr.radio.data.BlogPost
-import com.klsr.radio.databinding.ItemBlogHeroSlideBinding
 
 class BlogHeroAdapter(
     private val posts: List<BlogPost>,
@@ -13,8 +16,8 @@ class BlogHeroAdapter(
 ) : RecyclerView.Adapter<BlogHeroAdapter.VH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val binding = ItemBlogHeroSlideBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return VH(binding)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_blog_hero_slide, parent, false)
+        return VH(view)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
@@ -23,14 +26,19 @@ class BlogHeroAdapter(
 
     override fun getItemCount() = posts.size
 
-    inner class VH(private val b: ItemBlogHeroSlideBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val image: ImageView = itemView.findViewById(R.id.heroImage)
+        private val title: TextView = itemView.findViewById(R.id.heroTitle)
+        private val date: TextView = itemView.findViewById(R.id.heroDate)
+        private val readMore: View = itemView.findViewById(R.id.heroReadMoreBtn)
+
         fun bind(post: BlogPost) {
-            b.heroTitle.text = post.title
-            b.heroDate.text = post.date
+            title.text = post.title
+            date.text = post.date
             post.featuredMediaUrl?.let {
-                Glide.with(b.root.context).load(it).into(b.heroImage)
+                Glide.with(itemView.context).load(it).into(image)
             }
-            b.heroReadMoreBtn.setOnClickListener { onClick(post.id) }
+            readMore.setOnClickListener { onClick(post.id) }
         }
     }
 }
