@@ -9,10 +9,8 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.session.MediaController
@@ -28,7 +26,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private var mediaController: MediaController? = null
     private var currentStation = 0
-    private var isPlaying = false // local tracking for immediate UI update
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,18 +47,13 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // Bottom navigation – manual selection + highlight color
         setupBottomNav()
 
-        // Sync bottom nav with current destination
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.bottomNav.menu.findItem(destination.id)?.isChecked = true
         }
 
-        // Settings button in toolbar
-        binding.btnSettings.setOnClickListener {
-            navController.navigate(R.id.settingsFragment)
-        }
+        binding.btnSettings.setOnClickListener { navController.navigate(R.id.settingsFragment) }
 
         // MediaController
         try {
@@ -71,7 +63,6 @@ class MainActivity : AppCompatActivity() {
                 try {
                     mediaController = future.get()
                     mediaController?.addListener(PlayerListener())
-                    isPlaying = mediaController?.isPlaying ?: false
                     updatePlayerBar()
                 } catch (e: Exception) { Log.e("MainActivity", "MC get failed", e) }
             }, MoreExecutors.directExecutor())
@@ -79,20 +70,20 @@ class MainActivity : AppCompatActivity() {
 
         // Player bar buttons
         binding.playerBar.btnPlayPause.setOnClickListener {
-            mediaController?.let { mc ->
-                if (mc.isPlaying) {
-                    mc.pause()
-                } else {
-                    ensureServiceStarted()
-                    mc.play()
-                }
-                isPlaying = !isPlaying
-                updatePlayPauseIcon()
-            } ?: run {
+            val mc = mediaController
+            if (mc == null) {
                 ensureServiceStarted()
-                isPlaying = true
-                updatePlayPauseIcon()
+                updatePlayPauseIcon(true)
+                return@setOnClickListener
             }
+            if (mc.isPlaying) {
+                mc.pause()
+            } else {
+                ensureServiceStarted()
+                mc.play()
+            }
+            // Immediately update icon based on the action we just performed
+            updatePlayPauseIcon(!mc.isPlaying)
         }
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
@@ -101,44 +92,30 @@ class MainActivity : AppCompatActivity() {
             bottomSheet.show(supportFragmentManager, "ChannelSwitcher")
             supportFragmentManager.setFragmentResultListener(ChannelSwitcherFragment.REQUEST_KEY, this) { _, bundle ->
                 val index = bundle.getInt(ChannelSwitcherFragment.RESULT_INDEX, -1)
-                if (index != -1 && index != currentStation) {
-                    switchStation(index - currentStation)
-                }
+                if (index != -1 && index != currentStation) switchStation(index - currentStation)
             }
         }
     }
 
     private fun setupBottomNav() {
-        // Determine active highlight color based on night mode
         val nightModeFlags = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
         val isDark = nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
-
-        val activeColor = if (isDark) Color.parseColor("#FFD700") else Color.parseColor("#4fc3f7") // gold / light blue
-        val inactiveColor = Color.WHITE
-
-        val states = arrayOf(
-            intArrayOf(android.R.attr.state_checked),
-            intArrayOf()
+        val activeColor = if (isDark) Color.parseColor("#FFD700") else Color.parseColor("#4fc3f7")
+        val colorStateList = ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+            intArrayOf(activeColor, Color.WHITE)
         )
-        val colors = intArrayOf(activeColor, inactiveColor)
-        val colorStateList = ColorStateList(states, colors)
-
         binding.bottomNav.itemIconTintList = colorStateList
         binding.bottomNav.itemTextColor = colorStateList
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.moreMenuItem -> {
-                    showMoreMenu()
-                    false
-                }
+                R.id.moreMenuItem -> { showMoreMenu(); false }
                 else -> {
                     navController.navigate(item.itemId, null,
                         androidx.navigation.NavOptions.Builder()
                             .setPopUpTo(navController.graph.startDestinationId, false)
-                            .setLaunchSingleTop(true)
-                            .build()
-                    )
+                            .setLaunchSingleTop(true).build())
                     true
                 }
             }
@@ -177,19 +154,16 @@ class MainActivity : AppCompatActivity() {
         val s = RadioService.STATIONS[currentStation]
         binding.playerBar.stationName.text = s.name
         binding.playerBar.stationDesc.text = s.desc
-        updatePlayPauseIcon()
+        updatePlayPauseIcon(mc?.isPlaying ?: false)
     }
 
-    private fun updatePlayPauseIcon() {
+    private fun updatePlayPauseIcon(isPlaying: Boolean) {
         val icon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
         binding.playerBar.btnPlayPause.setImageResource(icon)
     }
 
     inner class PlayerListener : androidx.media3.common.Player.Listener {
-        override fun onIsPlayingChanged(playing: Boolean) {
-            isPlaying = playing
-            updatePlayPauseIcon()
-        }
+        override fun onIsPlayingChanged(isPlaying: Boolean) { updatePlayPauseIcon(isPlaying) }
         override fun onMediaItemTransition(item: androidx.media3.common.MediaItem?, reason: Int) {
             val idx = RadioService.STATIONS.indexOfFirst { it.url == item?.localConfiguration?.uri.toString() }
             if (idx != -1) currentStation = idx
