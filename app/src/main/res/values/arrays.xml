@@ -1,7 +1,6 @@
 <resources>
     <string-array name="theme_options">
-        <item>Deep Blue (Default)</item>
+        <item>Deep Blue</item>
         <item>Dark</item>
-        <item>Light</item>
     </string-array>
 </resources>

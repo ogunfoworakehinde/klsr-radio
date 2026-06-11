@@ -7,15 +7,13 @@ import com.klsr.radio.utils.CrashHandler
 class RadioApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        // Install global crash handler FIRST
         CrashHandler.init(this)
 
         try {
             val prefs = getSharedPreferences("settings", MODE_PRIVATE)
-            val dark = prefs.getBoolean("dark_mode", false)
-            AppCompatDelegate.setDefaultNightMode(
-                if (dark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            )
+            val theme = prefs.getString("app_theme", "deep_blue") ?: "deep_blue"
+            val mode = if (theme == "dark") AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            AppCompatDelegate.setDefaultNightMode(mode)
         } catch (_: Exception) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }

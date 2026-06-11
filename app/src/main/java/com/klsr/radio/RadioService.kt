@@ -20,8 +20,8 @@ class RadioService : Service() {
     private var stationIndex = 0
 
     companion object {
-        const val CHANNEL_ID = "radio_playback"
-        const val NOTIFICATION_ID = 101
+        const val CHANNEL_ID = "radio"
+        const val NOTIFY_ID = 101
         const val ACTION_PLAY_PAUSE = "com.klsr.radio.PLAY_PAUSE"
         const val EXTRA_STATION_INDEX = "station_index"
         val STATIONS = arrayOf(
@@ -35,7 +35,7 @@ class RadioService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
+        createChannel()
         player = ExoPlayer.Builder(this).build()
         mediaSession = MediaSession.Builder(this, player).build()
         playStation(stationIndex)
@@ -54,14 +54,14 @@ class RadioService : Service() {
                 if (player.isPlaying) player.pause() else player.play()
             }
             else -> {
-                val idx = intent?.getIntExtra(EXTRA_STATION_INDEX, -1) ?: -1
-                if (idx in STATIONS.indices && idx != stationIndex) {
-                    playStation(idx)
+                intent?.getIntExtra(EXTRA_STATION_INDEX, -1)?.let { idx ->
+                    if (idx in STATIONS.indices && idx != stationIndex) {
+                        playStation(idx)
+                    }
                 }
             }
         }
-        val notification = buildNotification()
-        startForeground(NOTIFICATION_ID, notification)
+        startForeground(NOTIFY_ID, buildNotification())
         return START_STICKY
     }
 
@@ -73,44 +73,32 @@ class RadioService : Service() {
         super.onDestroy()
     }
 
-    private fun createNotificationChannel() {
+    private fun createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Radio Playback",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply { description = "Shows current radio station" }
-            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+            val chan = NotificationChannel(CHANNEL_ID, "Radio", NotificationManager.IMPORTANCE_LOW)
+            getSystemService(NotificationManager::class.java).createNotificationChannel(chan)
         }
     }
 
     private fun buildNotification(): Notification {
-        val station = STATIONS[stationIndex]
-        val openIntent = PendingIntent.getActivity(
-            this, 0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val playPauseAction = NotificationCompat.Action(
+        val s = STATIONS[stationIndex]
+        val openIntent = PendingIntent.getActivity(this, 0,
+            Intent(this, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val ppAction = NotificationCompat.Action(
             if (player.isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
             if (player.isPlaying) "Pause" else "Play",
-            PendingIntent.getService(
-                this, 0,
+            PendingIntent.getService(this, 0,
                 Intent(this, RadioService::class.java).apply { action = ACTION_PLAY_PAUSE },
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(station.name)
-            .setContentText(station.desc)
+            .setContentTitle(s.name)
+            .setContentText(s.desc)
             .setContentIntent(openIntent)
             .setOngoing(player.isPlaying)
-            .addAction(playPauseAction)
-            .setStyle(
-                MediaStyleNotificationHelper.MediaStyle(mediaSession)
-                    .setShowActionsInCompactView(0)
-            )
+            .addAction(ppAction)
+            .setStyle(MediaStyleNotificationHelper.MediaStyle(mediaSession).setShowActionsInCompactView(0))
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
     }

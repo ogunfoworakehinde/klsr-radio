@@ -1,22 +1,12 @@
 <resources>
-    <!-- Dark Theme -->
+    <!-- Dark Mode -->
     <style name="Theme.KLSRRadio" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Gold for buttons and accents -->
-        <item name="colorPrimary">#d4af37</item>
-        <item name="colorPrimaryDark">#121212</item>
-        <item name="colorAccent">#d4af37</item>
-
-        <!-- Surfaces: black -->
-        <item name="colorSurface">@color/black</item>
-        <item name="colorOnSurface">@color/white</item>
-        <!-- Text on gold buttons should be dark for contrast -->
-        <item name="colorOnPrimary">#0a0f2d</item>
-        <item name="colorOnSecondary">#0a0f2d</item>
-
-        <!-- Background of app -->
-        <item name="android:colorBackground">#121212</item>
-
-        <!-- Status & nav bars -->
+        <item name="colorPrimary">#000000</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorAccent">#FFD700</item>    <!-- gold -->
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSurface">#121212</item>
+        <item name="colorOnSurface">#FFFFFF</item>
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
     </style>

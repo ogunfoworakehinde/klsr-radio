@@ -1,41 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?android:attr/colorBackground">
+    android:background="?attr/colorPrimary"
+    android:orientation="vertical">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/blogHeroViewPager"
-        android:layout_width="match_parent"
-        android:layout_height="250dp" />
-
-    <LinearLayout
-        android:id="@+id/blogDotsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal" />
-
-    <!-- Fixed: proper drawable background -->
-    <EditText
-        android:id="@+id/searchEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:drawableStart="@drawable/ic_search"
-        android:hint="Search articles..."
-        android:inputType="text"
-        android:background="@android:drawable/edit_text"
-        android:textColor="?attr/colorOnSurface"
-        android:textColorHint="?attr/colorOnSurface" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/blogRecyclerView"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="8dp" />
+        android:layout_weight="1">
 
-    <include layout="@layout/pagination_controls" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Hero slider (dynamic) -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/blogHeroViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="250dp" />
+
+            <LinearLayout
+                android:id="@+id/blogHeroDots"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="8dp" />
+
+            <!-- Search bar -->
+            <EditText
+                android:id="@+id/searchEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:drawableStart="@drawable/ic_search"
+                android:hint="Search articles..."
+                android:inputType="text"
+                android:background="@android:drawable/edit_text" />
+
+            <!-- Section header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Articles"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Browse our collection of spiritual insights"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Posts list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/blogRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:clipToPadding="false"
+                android:padding="8dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Pagination (outside scroll) -->
+    <include
+        android:id="@+id/paginationControls"
+        layout="@layout/pagination_controls" />
 </LinearLayout>

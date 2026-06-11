@@ -1,27 +1,17 @@
 <resources>
-    <!-- Deep Blue (Light) Theme -->
+    <!-- Deep Blue (Light) -->
     <style name="Theme.KLSRRadio" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary = Deep blue for buttons, app bar -->
         <item name="colorPrimary">#0a0f2d</item>
         <item name="colorPrimaryDark">#05081a</item>
-        <!-- Accent (unused but kept) -->
-        <item name="colorAccent">#0a0f2d</item>
-
-        <!-- Surfaces (cards, pages) -->
-        <item name="colorSurface">@color/white</item>
-        <item name="colorOnSurface">@color/black</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorOnSecondary">@color/black</item>
-
-        <!-- Background of the whole app -->
-        <item name="android:colorBackground">#f5f7ff</item>
-
-        <!-- Status bar & navigation -->
+        <item name="colorAccent">#0a0f2d</item>   <!-- buttons, active nav -->
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#000000</item>
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryDark</item>
     </style>
 
     <style name="Theme.Splash" parent="Theme.KLSRRadio">
-        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowBackground">@color/splash_bg</item>
     </style>
 </resources>
