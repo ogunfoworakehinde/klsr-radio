@@ -17,8 +17,13 @@
         android:layout_height="wrap_content"
         android:text=""
         android:textColor="?attr/colorOnPrimary" />
-    <AudioMediaPlayer
+    <!-- Placeholder for audio player (will be replaced later) -->
+    <TextView
         android:id="@+id/podcastAudioPlayer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:text="[Audio Player]"
+        android:textColor="?attr/colorOnPrimary"
+        android:background="@android:drawable/edit_text" />
 </LinearLayout>
