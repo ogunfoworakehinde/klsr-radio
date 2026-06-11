@@ -1,0 +1,56 @@
+package com.klsr.radio.adapters
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.klsr.radio.R
+import com.klsr.radio.data.BlogPost
+
+class BlogHeroSliderAdapter(
+    private val posts: List<BlogPost>,
+    private val onClick: (Int) -> Unit
+) : RecyclerView.Adapter<BlogHeroSliderAdapter.VH>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_blog_hero_slide, parent, false)
+        return VH(view)
+    }
+
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        holder.bind(posts[position])
+    }
+
+    override fun getItemCount() = posts.size
+
+    inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val image: ImageView = itemView.findViewById(R.id.heroImage)
+        private val title: TextView = itemView.findViewById(R.id.heroTitle)
+        private val date: TextView = itemView.findViewById(R.id.heroDate)
+        private val excerpt: TextView = itemView.findViewById(R.id.heroExcerpt)
+        private val readMore: View = itemView.findViewById(R.id.heroReadMoreBtn)
+
+        fun bind(post: BlogPost) {
+            title.text = post.title
+            date.text = post.date
+            excerpt.text = post.excerpt
+
+            // Load image with Glide, fallback to placeholder color if fails
+            post.featuredMediaUrl?.let { url ->
+                Glide.with(itemView.context)
+                    .load(url)
+                    .placeholder(R.drawable.hero_placeholder)
+                    .error(R.drawable.hero_placeholder)
+                    .into(image)
+            } ?: run {
+                image.setImageResource(R.drawable.hero_placeholder)
+            }
+
+            readMore.setOnClickListener { onClick(post.id) }
+        }
+    }
+}

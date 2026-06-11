@@ -39,6 +39,16 @@
             android:textColor="#CCCCCC"
             android:textSize="14sp" />
 
+        <TextView
+            android:id="@+id/heroExcerpt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
         <Button
             android:id="@+id/heroReadMoreBtn"
             style="@style/Widget.MaterialComponents.Button.TextButton"
