@@ -13,6 +13,7 @@ import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation.NavController
@@ -35,18 +36,14 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // Notification permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED)
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
-            }
         }
 
-        // NavController
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-
         setupBottomNav()
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -55,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnSettings.setOnClickListener { navController.navigate(R.id.settingsFragment) }
 
-        // MediaController
+        // MediaController – connect to the already running service
         try {
             val token = SessionToken(this, ComponentName(this, RadioService::class.java))
             val future = MediaController.Builder(this, token).buildAsync()
@@ -68,22 +65,15 @@ class MainActivity : AppCompatActivity() {
             }, MoreExecutors.directExecutor())
         } catch (e: Exception) { Log.e("MainActivity", "SessionToken failed", e) }
 
-        // Player bar buttons
+        // Player bar buttons – use MediaController directly, always
         binding.playerBar.btnPlayPause.setOnClickListener {
             val mc = mediaController
             if (mc == null) {
                 ensureServiceStarted()
-                updatePlayPauseIcon(true)
                 return@setOnClickListener
             }
-            if (mc.isPlaying) {
-                mc.pause()
-            } else {
-                ensureServiceStarted()
-                mc.play()
-            }
-            // Immediately update icon based on the action we just performed
-            updatePlayPauseIcon(!mc.isPlaying)
+            // Toggle exactly like the lock-screen does
+            if (mc.isPlaying) mc.pause() else mc.play()
         }
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
@@ -98,8 +88,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        val nightModeFlags = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
-        val isDark = nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
         val activeColor = if (isDark) Color.parseColor("#FFD700") else Color.parseColor("#4fc3f7")
         val colorStateList = ColorStateList(
             arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
@@ -162,7 +152,7 @@ class MainActivity : AppCompatActivity() {
         binding.playerBar.btnPlayPause.setImageResource(icon)
     }
 
-    inner class PlayerListener : androidx.media3.common.Player.Listener {
+    inner class PlayerListener : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) { updatePlayPauseIcon(isPlaying) }
         override fun onMediaItemTransition(item: androidx.media3.common.MediaItem?, reason: Int) {
             val idx = RadioService.STATIONS.indexOfFirst { it.url == item?.localConfiguration?.uri.toString() }
