@@ -4,11 +4,9 @@ import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private var mediaController: MediaController? = null
     private var currentStation = 0
+    private var isPlaying = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +44,6 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-
-        // Set up custom bottom nav
         setupCustomBottomNav()
 
         binding.btnSettings.setOnClickListener { navController.navigate(R.id.settingsFragment) }
@@ -59,18 +56,26 @@ class MainActivity : AppCompatActivity() {
                 try {
                     mediaController = future.get()
                     mediaController?.addListener(PlayerListener())
+                    isPlaying = mediaController?.isPlaying ?: false
+                    updatePlayPauseIcon(isPlaying)
                     updatePlayerBar()
                 } catch (e: Exception) { Log.e("MainActivity", "MC get failed", e) }
             }, MoreExecutors.directExecutor())
         } catch (e: Exception) { Log.e("MainActivity", "SessionToken failed", e) }
 
-        // Player bar – use intent for reliable play/pause
+        // Player bar – toggle using MediaController if available, else start service
         binding.playerBar.btnPlayPause.setOnClickListener {
-            val intent = Intent(this, RadioService::class.java).apply {
-                action = RadioService.ACTION_PLAY_PAUSE
+            val mc = mediaController
+            if (mc != null) {
+                if (mc.isPlaying) mc.pause() else mc.play()
+                // Icon will be updated by the listener callback
+            } else {
+                // service not connected yet, start it
+                ensureServiceStarted()
+                // assume it will start playing
+                isPlaying = true
+                updatePlayPauseIcon(true)
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(intent)
-            else startService(intent)
         }
         binding.playerBar.btnPrev.setOnClickListener { switchStation(-1) }
         binding.playerBar.btnNext.setOnClickListener { switchStation(1) }
@@ -85,14 +90,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupCustomBottomNav() {
-        // Map button IDs to navigation destinations
         val buttonMap = mapOf(
             R.id.nav_home to R.id.homeFragment,
             R.id.nav_podcast to R.id.podcastFragment,
             R.id.nav_prayer to R.id.prayerFragment,
             R.id.nav_blog to R.id.blogFragment
         )
-        // "More" button handled separately
 
         buttonMap.forEach { (btnId, destId) ->
             findViewById<Button>(btnId).setOnClickListener {
@@ -103,8 +106,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Button>(R.id.nav_more).setOnClickListener {
-            val popup = PopupMenu(this, it)
+        findViewById<Button>(R.id.nav_more).setOnClickListener { view ->
+            val popup = PopupMenu(this, view)
             popup.menuInflater.inflate(R.menu.more_popup_menu, popup.menu)
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
@@ -118,13 +121,10 @@ class MainActivity : AppCompatActivity() {
             popup.show()
         }
 
-        // Highlight correct button based on current destination
         navController.addOnDestinationChangedListener { _, destination, _ ->
             buttonMap.entries.forEach { (btnId, destId) ->
-                val btn = findViewById<Button>(btnId)
-                btn.isSelected = (destination.id == destId)
+                findViewById<Button>(btnId).isSelected = (destination.id == destId)
             }
-            // "More" is selected if destination is about/donation/contact/settings
             val moreDestinations = listOf(R.id.aboutFragment, R.id.donationFragment, R.id.contactFragment, R.id.settingsFragment)
             findViewById<Button>(R.id.nav_more).isSelected = moreDestinations.contains(destination.id)
         }
@@ -149,17 +149,20 @@ class MainActivity : AppCompatActivity() {
         updatePlayPauseIcon(mc?.isPlaying ?: false)
     }
 
-    private fun updatePlayPauseIcon(isPlaying: Boolean) {
-        val icon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
+    private fun updatePlayPauseIcon(playing: Boolean) {
+        isPlaying = playing
+        val icon = if (playing) R.drawable.ic_pause else R.drawable.ic_play_arrow
         binding.playerBar.btnPlayPause.setImageResource(icon)
     }
 
     inner class PlayerListener : Player.Listener {
-        override fun onIsPlayingChanged(isPlaying: Boolean) { updatePlayPauseIcon(isPlaying) }
+        override fun onIsPlayingChanged(playing: Boolean) {
+            runOnUiThread { updatePlayPauseIcon(playing) }
+        }
         override fun onMediaItemTransition(item: androidx.media3.common.MediaItem?, reason: Int) {
             val idx = RadioService.STATIONS.indexOfFirst { it.url == item?.localConfiguration?.uri.toString() }
             if (idx != -1) currentStation = idx
-            updatePlayerBar()
+            runOnUiThread { updatePlayerBar() }
         }
     }
 }

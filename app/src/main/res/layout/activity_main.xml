@@ -86,7 +86,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <Button android:drawableTint="@drawable/nav_item_text_color"
+        <Button
             android:id="@+id/nav_home"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -96,13 +96,14 @@
             android:drawableTop="@drawable/ic_home"
             android:drawablePadding="2dp"
             android:background="@drawable/nav_item_bg"
-            android:textColor="@drawable/nav_item_text_color"
+            android:textColor="@drawable/nav_text_color_selector"
+            android:drawableTint="@drawable/nav_text_color_selector"
             android:textSize="10sp"
             android:gravity="center"
             android:insetTop="0dp"
             android:insetBottom="0dp" />
 
-        <Button android:drawableTint="@drawable/nav_item_text_color"
+        <Button
             android:id="@+id/nav_podcast"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -112,13 +113,14 @@
             android:drawableTop="@drawable/ic_podcasts"
             android:drawablePadding="2dp"
             android:background="@drawable/nav_item_bg"
-            android:textColor="@drawable/nav_item_text_color"
+            android:textColor="@drawable/nav_text_color_selector"
+            android:drawableTint="@drawable/nav_text_color_selector"
             android:textSize="10sp"
             android:gravity="center"
             android:insetTop="0dp"
             android:insetBottom="0dp" />
 
-        <Button android:drawableTint="@drawable/nav_item_text_color"
+        <Button
             android:id="@+id/nav_prayer"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -128,13 +130,14 @@
             android:drawableTop="@drawable/ic_prayer"
             android:drawablePadding="2dp"
             android:background="@drawable/nav_item_bg"
-            android:textColor="@drawable/nav_item_text_color"
+            android:textColor="@drawable/nav_text_color_selector"
+            android:drawableTint="@drawable/nav_text_color_selector"
             android:textSize="10sp"
             android:gravity="center"
             android:insetTop="0dp"
             android:insetBottom="0dp" />
 
-        <Button android:drawableTint="@drawable/nav_item_text_color"
+        <Button
             android:id="@+id/nav_blog"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -144,13 +147,14 @@
             android:drawableTop="@drawable/ic_article"
             android:drawablePadding="2dp"
             android:background="@drawable/nav_item_bg"
-            android:textColor="@drawable/nav_item_text_color"
+            android:textColor="@drawable/nav_text_color_selector"
+            android:drawableTint="@drawable/nav_text_color_selector"
             android:textSize="10sp"
             android:gravity="center"
             android:insetTop="0dp"
             android:insetBottom="0dp" />
 
-        <Button android:drawableTint="@drawable/nav_item_text_color"
+        <Button
             android:id="@+id/nav_more"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -160,7 +164,8 @@
             android:drawableTop="@drawable/ic_more_horiz"
             android:drawablePadding="2dp"
             android:background="@drawable/nav_item_bg"
-            android:textColor="@drawable/nav_item_text_color"
+            android:textColor="@drawable/nav_text_color_selector"
+            android:drawableTint="@drawable/nav_text_color_selector"
             android:textSize="10sp"
             android:gravity="center"
             android:insetTop="0dp"

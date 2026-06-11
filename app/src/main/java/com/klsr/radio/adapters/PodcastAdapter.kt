@@ -30,32 +30,29 @@ class PodcastAdapter(
             b.podcastTitle.text = episode.title
             b.podcastDescription.text = episode.description ?: ""
 
-            // Format date
+            // Date
             try {
                 val inputFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
                 val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                 episode.pubDate?.let { dateStr ->
                     val date = inputFormat.parse(dateStr)
-                    if (date != null) {
-                        b.podcastDate.text = outputFormat.format(date)
-                    } else {
-                        b.podcastDate.text = dateStr.take(10)
-                    }
+                    b.podcastDate.text = date?.let { outputFormat.format(it) } ?: dateStr.take(10)
                 }
             } catch (e: Exception) {
                 b.podcastDate.text = episode.pubDate?.take(10) ?: ""
             }
 
-            // Load image with Glide
+            // Duration
+            b.podcastDuration.text = episode.duration ?: ""
+
+            // Image
             episode.imageUrl?.let {
                 Glide.with(b.root.context).load(it).into(b.podcastImage)
             } ?: run {
                 b.podcastImage.setBackgroundColor(0xFF1a235c.toInt())
             }
 
-            b.btnPlayEpisode.setOnClickListener {
-                onPlayClick(episode)
-            }
+            b.btnPlayEpisode.setOnClickListener { onPlayClick(episode) }
         }
     }
 }
