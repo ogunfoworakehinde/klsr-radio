@@ -2,14 +2,13 @@ package com.klsr.radio
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.*
 
 class SplashActivity : AppCompatActivity() {
 
@@ -17,28 +16,40 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        val circle1 = findViewById<ImageView>(R.id.circle1)
-        val circle2 = findViewById<ImageView>(R.id.circle2)
-        val circle3 = findViewById<ImageView>(R.id.circle3)
-        val circle4 = findViewById<ImageView>(R.id.circle4)
+        val circles = listOf(
+            findViewById<ImageView>(R.id.circle1),
+            findViewById<ImageView>(R.id.circle2),
+            findViewById<ImageView>(R.id.circle3),
+            findViewById<ImageView>(R.id.circle4)
+        )
 
-        val pulseAnim = AnimationUtils.loadAnimation(this, R.anim.pulse_circle)
+        circles.forEachIndexed { index, circle ->
+            circle.visibility = View.VISIBLE
+            startPulseAnimation(circle, index * 200L)
+        }
 
-        // Stagger the start of each circle to create a "breathing" wave
-        circle1.visibility = View.VISIBLE
-        circle2.visibility = View.VISIBLE
-        circle3.visibility = View.VISIBLE
-        circle4.visibility = View.VISIBLE
-
-        circle1.startAnimation(pulseAnim)
-        circle2.startAnimation(pulseAnim.apply { startOffset = 300 })
-        circle3.startAnimation(pulseAnim.apply { startOffset = 600 })
-        circle4.startAnimation(pulseAnim.apply { startOffset = 900 })
-
-        // Transition to MainActivity after 3 seconds
+        // Open MainActivity after 3.5 seconds
         window.decorView.postDelayed({
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }, 3500)
+    }
+
+    private fun startPulseAnimation(view: View, startDelay: Long) {
+        val scaleX = ObjectAnimator.ofFloat(view, "scaleX", 0.8f, 1.3f)
+        val scaleY = ObjectAnimator.ofFloat(view, "scaleY", 0.8f, 1.3f)
+        val alpha = ObjectAnimator.ofFloat(view, "alpha", 0.6f, 0.0f)
+
+        listOf(scaleX, scaleY, alpha).forEach {
+            it.duration = 1200
+            it.repeatCount = ValueAnimator.INFINITE
+            it.repeatMode = ValueAnimator.REVERSE
+            it.interpolator = LinearInterpolator()
+        }
+
+        val set = AnimatorSet()
+        set.playTogether(scaleX, scaleY, alpha)
+        set.startDelay = startDelay
+        set.start()
     }
 }
