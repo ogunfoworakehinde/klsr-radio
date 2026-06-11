@@ -1,4 +1,4 @@
-package com.klsr.radio.utils
+package com.kingdomlifestyleradio.klsradio.utils
 
 import android.content.Context
 import android.content.Intent
@@ -17,7 +17,7 @@ class CrashHandler(private val defaultHandler: Thread.UncaughtExceptionHandler?)
 
         // Save to a file
         try {
-            val file = File("/data/data/com.klsr.radio/files/last_crash.txt")
+            val file = File("/data/data/com.kingdomlifestyleradio.klsradio/files/last_crash.txt")
             file.parentFile?.mkdirs()
             file.writeText(stacktrace)
         } catch (_: Exception) {}

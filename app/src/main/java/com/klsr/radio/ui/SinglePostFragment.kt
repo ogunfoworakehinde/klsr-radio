@@ -1,4 +1,4 @@
-package com.klsr.radio.ui
+package com.kingdomlifestyleradio.klsradio.ui
 
 import android.os.Bundle
 import android.text.Html
@@ -8,9 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
-import com.klsr.radio.R
-import com.klsr.radio.data.BlogPostResponse
-import com.klsr.radio.databinding.FragmentSinglePostBinding
+import com.kingdomlifestyleradio.klsradio.R
+import com.kingdomlifestyleradio.klsradio.data.BlogPostResponse
+import com.kingdomlifestyleradio.klsradio.databinding.FragmentSinglePostBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

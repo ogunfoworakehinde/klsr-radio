@@ -1,4 +1,4 @@
-package com.klsr.radio.ui
+package com.kingdomlifestyleradio.klsradio.ui
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -9,10 +9,10 @@ import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import com.klsr.radio.MainActivity
-import com.klsr.radio.R
-import com.klsr.radio.RadioService
-import com.klsr.radio.databinding.FragmentSettingsBinding
+import com.kingdomlifestyleradio.klsradio.MainActivity
+import com.kingdomlifestyleradio.klsradio.R
+import com.kingdomlifestyleradio.klsradio.RadioService
+import com.kingdomlifestyleradio.klsradio.databinding.FragmentSettingsBinding
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private var _binding: FragmentSettingsBinding? = null

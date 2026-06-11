@@ -1,4 +1,4 @@
-package com.klsr.radio.ui
+package com.kingdomlifestyleradio.klsradio.ui
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -8,10 +8,10 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.klsr.radio.R
-import com.klsr.radio.adapters.PodcastAdapter
-import com.klsr.radio.data.PodcastEpisode
-import com.klsr.radio.databinding.FragmentPodcastBinding
+import com.kingdomlifestyleradio.klsradio.R
+import com.kingdomlifestyleradio.klsradio.adapters.PodcastAdapter
+import com.kingdomlifestyleradio.klsradio.data.PodcastEpisode
+import com.kingdomlifestyleradio.klsradio.databinding.FragmentPodcastBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

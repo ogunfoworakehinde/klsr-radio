@@ -1,9 +1,9 @@
-package com.klsr.radio.adapters
+package com.kingdomlifestyleradio.klsradio.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.klsr.radio.databinding.ItemHeroSlideBinding
+import com.kingdomlifestyleradio.klsradio.databinding.ItemHeroSlideBinding
 
 class HeroSliderAdapter(private val images: List<Int>) : RecyclerView.Adapter<HeroSliderAdapter.VH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {

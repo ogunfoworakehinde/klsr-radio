@@ -1,4 +1,4 @@
-package com.klsr.radio
+package com.kingdomlifestyleradio.klsradio
 
 import android.Manifest
 import android.content.ComponentName
@@ -19,8 +19,8 @@ import androidx.media3.session.SessionToken
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.common.util.concurrent.MoreExecutors
-import com.klsr.radio.databinding.ActivityMainBinding
-import com.klsr.radio.ui.ChannelSwitcherFragment
+import com.kingdomlifestyleradio.klsradio.databinding.ActivityMainBinding
+import com.kingdomlifestyleradio.klsradio.ui.ChannelSwitcherFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

@@ -1,4 +1,4 @@
-package com.klsr.radio
+package com.kingdomlifestyleradio.klsradio
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator

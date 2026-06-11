@@ -1,4 +1,4 @@
-package com.klsr.radio.ui
+package com.kingdomlifestyleradio.klsradio.ui
 
 import android.app.Dialog
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.setFragmentResult
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.klsr.radio.RadioService
+import com.kingdomlifestyleradio.klsradio.RadioService
 
 class ChannelSwitcherFragment : BottomSheetDialogFragment() {
     companion object {

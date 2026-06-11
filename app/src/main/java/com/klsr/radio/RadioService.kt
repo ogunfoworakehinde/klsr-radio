@@ -1,4 +1,4 @@
-package com.klsr.radio
+package com.kingdomlifestyleradio.klsradio
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -22,10 +22,10 @@ class RadioService : Service() {
     companion object {
         const val CHANNEL_ID = "radio"
         const val NOTIFY_ID = 101
-        const val ACTION_PLAY_PAUSE = "com.klsr.radio.PLAY_PAUSE"
-        const val ACTION_STOP = "com.klsr.radio.STOP"
-        const val ACTION_NEXT = "com.klsr.radio.NEXT"
-        const val ACTION_PREV = "com.klsr.radio.PREV"
+        const val ACTION_PLAY_PAUSE = "com.kingdomlifestyleradio.klsradio.PLAY_PAUSE"
+        const val ACTION_STOP = "com.kingdomlifestyleradio.klsradio.STOP"
+        const val ACTION_NEXT = "com.kingdomlifestyleradio.klsradio.NEXT"
+        const val ACTION_PREV = "com.kingdomlifestyleradio.klsradio.PREV"
         const val EXTRA_STATION_INDEX = "station_index"
         val STATIONS = arrayOf(
             Station("English Gospel", "https://s3.voscast.com:9425/stream", "24/7 English Gospel Music"),

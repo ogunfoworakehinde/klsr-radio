@@ -1,4 +1,4 @@
-package com.klsr.radio.adapters
+package com.kingdomlifestyleradio.klsradio.adapters
 
 import android.text.Html
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
-import com.klsr.radio.R
-import com.klsr.radio.data.PodcastEpisode
-import com.klsr.radio.databinding.ItemPodcastBinding
+import com.kingdomlifestyleradio.klsradio.R
+import com.kingdomlifestyleradio.klsradio.data.PodcastEpisode
+import com.kingdomlifestyleradio.klsradio.databinding.ItemPodcastBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 

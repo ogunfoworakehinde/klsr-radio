@@ -1,11 +1,11 @@
-package com.klsr.radio.adapters
+package com.kingdomlifestyleradio.klsradio.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.klsr.radio.data.BlogPost
-import com.klsr.radio.databinding.ItemBlogPostBinding
+import com.kingdomlifestyleradio.klsradio.data.BlogPost
+import com.kingdomlifestyleradio.klsradio.databinding.ItemBlogPostBinding
 
 class BlogPostAdapter(
     private val items: List<BlogPost>,

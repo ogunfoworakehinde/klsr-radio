@@ -1,4 +1,4 @@
-package com.klsr.radio.adapters
+package com.kingdomlifestyleradio.klsradio.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.klsr.radio.R
-import com.klsr.radio.data.BlogPost
+import com.kingdomlifestyleradio.klsradio.R
+import com.kingdomlifestyleradio.klsradio.data.BlogPost
 
 class BlogHeroAdapter(
     private val posts: List<BlogPost>,

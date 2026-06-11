@@ -1,4 +1,4 @@
-package com.klsr.radio.ui
+package com.kingdomlifestyleradio.klsradio.ui
 
 import android.content.Context
 import android.content.Intent
@@ -8,10 +8,10 @@ import android.os.Looper
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import com.klsr.radio.R
-import com.klsr.radio.RadioService
-import com.klsr.radio.adapters.HeroSliderAdapter
-import com.klsr.radio.databinding.FragmentHomeBinding
+import com.kingdomlifestyleradio.klsradio.R
+import com.kingdomlifestyleradio.klsradio.RadioService
+import com.kingdomlifestyleradio.klsradio.adapters.HeroSliderAdapter
+import com.kingdomlifestyleradio.klsradio.databinding.FragmentHomeBinding
 import java.io.File
 
 class HomeFragment : Fragment(R.layout.fragment_home) {

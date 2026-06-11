@@ -1,8 +1,8 @@
-package com.klsr.radio
+package com.kingdomlifestyleradio.klsradio
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import com.klsr.radio.utils.CrashHandler
+import com.kingdomlifestyleradio.klsradio.utils.CrashHandler
 
 class RadioApplication : Application() {
     override fun onCreate() {

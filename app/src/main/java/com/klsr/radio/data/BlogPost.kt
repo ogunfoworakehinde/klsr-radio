@@ -1,4 +1,4 @@
-package com.klsr.radio.data
+package com.kingdomlifestyleradio.klsradio.data
 
 data class BlogPost(
     val id: Int,

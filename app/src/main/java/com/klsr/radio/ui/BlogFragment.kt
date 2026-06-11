@@ -1,4 +1,4 @@
-package com.klsr.radio.ui
+package com.kingdomlifestyleradio.klsradio.ui
 
 import android.os.Bundle
 import android.os.Handler
@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.klsr.radio.R
-import com.klsr.radio.adapters.BlogPostAdapter
-import com.klsr.radio.adapters.BlogHeroSliderAdapter
-import com.klsr.radio.data.BlogPost
-import com.klsr.radio.data.BlogPostResponse
-import com.klsr.radio.databinding.FragmentBlogBinding
+import com.kingdomlifestyleradio.klsradio.R
+import com.kingdomlifestyleradio.klsradio.adapters.BlogPostAdapter
+import com.kingdomlifestyleradio.klsradio.adapters.BlogHeroSliderAdapter
+import com.kingdomlifestyleradio.klsradio.data.BlogPost
+import com.kingdomlifestyleradio.klsradio.data.BlogPostResponse
+import com.kingdomlifestyleradio.klsradio.databinding.FragmentBlogBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

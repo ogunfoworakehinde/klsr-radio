@@ -5,43 +5,43 @@
     app:startDestination="@id/homeFragment">
 
     <fragment android:id="@+id/homeFragment"
-        android:name="com.klsr.radio.ui.HomeFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.HomeFragment"
         android:label="Home" />
 
     <fragment android:id="@+id/podcastFragment"
-        android:name="com.klsr.radio.ui.PodcastFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.PodcastFragment"
         android:label="Podcasts" />
 
     <fragment android:id="@+id/prayerFragment"
-        android:name="com.klsr.radio.ui.PrayerFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.PrayerFragment"
         android:label="Prayer" />
 
     <fragment android:id="@+id/blogFragment"
-        android:name="com.klsr.radio.ui.BlogFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.BlogFragment"
         android:label="Blog">
         <action android:id="@+id/action_blog_to_singlePost"
             app:destination="@id/singlePostFragment" />
     </fragment>
 
     <fragment android:id="@+id/singlePostFragment"
-        android:name="com.klsr.radio.ui.SinglePostFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.SinglePostFragment"
         android:label="Article">
         <argument android:name="postId" app:argType="integer" android:defaultValue="0" />
     </fragment>
 
     <fragment android:id="@+id/aboutFragment"
-        android:name="com.klsr.radio.ui.AboutFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.AboutFragment"
         android:label="About" />
 
     <fragment android:id="@+id/donationFragment"
-        android:name="com.klsr.radio.ui.DonationFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.DonationFragment"
         android:label="Donate" />
 
     <fragment android:id="@+id/contactFragment"
-        android:name="com.klsr.radio.ui.ContactFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.ContactFragment"
         android:label="Contact" />
 
     <fragment android:id="@+id/settingsFragment"
-        android:name="com.klsr.radio.ui.SettingsFragment"
+        android:name="com.kingdomlifestyleradio.klsradio.ui.SettingsFragment"
         android:label="Settings" />
 </navigation>

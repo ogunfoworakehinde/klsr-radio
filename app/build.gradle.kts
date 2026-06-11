@@ -3,16 +3,25 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 android {
-    namespace = "com.klsr.radio"
+    namespace = "com.kingdomlifestyleradio.klsradio"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.klsr.radio"
+        applicationId = "com.kingdomlifestyleradio.klsradio"
         minSdk = 21
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 140000
+        versionName = "14.0.0"
+    }
+    signingConfigs {
+        create("release") {
+            storeFile = file("klsradio-release.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = "upload"
+            keyPassword = System.getenv("KEY_PASSWORD")
+        }
     }
     buildTypes { release { isMinifyEnabled = false } }
+            signingConfig = signingConfigs.getByName("release")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
