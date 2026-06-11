@@ -22,6 +22,60 @@ jobs:
         with:
           gradle-version: '8.4'
 
+      - name: Normalize PNG files (fix release build)
+        run: |
+          python3 - << 'PYEOF'
+          import os, struct, zlib
+
+          def fix_png(path):
+              try:
+                  with open(path, 'rb') as f:
+                      data = f.read()
+                  # Check valid PNG signature
+                  if data[:8] != b'\x89PNG\r\n\x1a\n':
+                      raise ValueError("Not a PNG")
+                  # Re-encode to strip any extra chunks
+                  # We'll parse chunks and rebuild minimal valid PNG
+                  pos = 8
+                  chunks = []
+                  while pos < len(data):
+                      length = struct.unpack('>I', data[pos:pos+4])[0]
+                      chunk_type = data[pos+4:pos+8]
+                      chunk_data = data[pos+8:pos+8+length]
+                      chunk_crc = data[pos+8+length:pos+12+length]
+                      chunks.append((chunk_type, chunk_data))
+                      pos += 12 + length
+                  # Rebuild: IHDR first, then IDAT (combine all IDAT chunks), then IEND
+                  ihdr = next(c for t,c in chunks if t == b'IHDR')
+                  idat_chunks = [c for t,c in chunks if t == b'IDAT']
+                  idat_data = b''.join(idat_chunks)
+                  # Re-compress the IDAT data to clean it
+                  raw = zlib.decompress(idat_data)
+                  new_idat = zlib.compress(raw)
+                  # Build new PNG
+                  def chunk(t, d):
+                      c = t + d
+                      return struct.pack('>I', len(d)) + c + struct.pack('>I', zlib.crc32(c) & 0xffffffff)
+                  new_png = b'\x89PNG\r\n\x1a\n'
+                  new_png += chunk(b'IHDR', ihdr)
+                  new_png += chunk(b'IDAT', new_idat)
+                  # Preserve other chunks if needed (like tEXt, etc.), but for simplicity we keep only IHDR+IDAT+IEND
+                  for t, d in chunks:
+                      if t not in (b'IHDR', b'IDAT', b'IEND'):
+                          new_png += chunk(t, d)
+                  new_png += chunk(b'IEND', b'')
+                  with open(path, 'wb') as f:
+                      f.write(new_png)
+                  print(f"Fixed: {path}")
+              except Exception as e:
+                  print(f"Skipping {path}: {e}")
+
+          for root, dirs, files in os.walk('app/src/main/res'):
+              for file in files:
+                  if file.lower().endswith('.png'):
+                      fix_png(os.path.join(root, file))
+          PYEOF
+
       - name: Decode Keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > klsradio-release.keystore
